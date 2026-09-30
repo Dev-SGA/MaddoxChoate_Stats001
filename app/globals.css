@@ -275,12 +275,12 @@ body::before {
   overflow: hidden;
 }
 
-.topic--build-up {
+.topic--back-playing {
   --topic-color: var(--accent);
   background: color-mix(in srgb, var(--sga-blue) 14%, var(--surface));
 }
 
-.topic--defensive {
+.topic--finishing {
   --topic-color: #7a8f9f;
   background: color-mix(in srgb, var(--sga-white) 8%, var(--surface));
   border-left-color: #7a8f9f;
@@ -300,11 +300,11 @@ body::before {
   text-transform: uppercase;
 }
 
-.topic--build-up .topic__phase {
+.topic--back-playing .topic__phase {
   color: var(--tone-accent);
 }
 
-.topic--defensive .topic__phase {
+.topic--finishing .topic__phase {
   color: var(--text-faint);
 }
 

@@ -7,11 +7,11 @@ type StatsGamePdfSheetProps = {
   logoUrl: string;
 };
 
-type Phase = "build-up" | "defensive";
+type Phase = "back-playing" | "finishing";
 
 const PHASE_LABEL: Record<Phase, string> = {
-  "build-up": "Build-Up",
-  defensive: "Defensive Phase",
+  "back-playing": "Back Playing",
+  finishing: "Finishing",
 };
 
 function pct(value: number, total: number): number {
@@ -123,7 +123,6 @@ function PdfVideoLinks({
 export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfSheetProps) {
   const { player, meta, backFootDuels, backFootPassing, oneVoneFinishing, finishing } = stats;
   const passAttempts = backFootPassing.correct + backFootPassing.wrong;
-  const issued = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
   return (
     <article className="stats-pdf" aria-hidden="true">
@@ -147,13 +146,12 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
           </div>
           <div className="spdf-head__meta">
             <span>{meta.subtitle}</span>
-            <span>{issued}</span>
           </div>
         </header>
 
         <div className="spdf-grid">
           <Section
-            phase="defensive"
+            phase="back-playing"
             title="Back-Foot Duels"
             value={String(backFootDuels.successfulPressure)}
             unit="successful holds"
@@ -162,7 +160,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
           </Section>
 
           <Section
-            phase="build-up"
+            phase="back-playing"
             title="Back-Foot Play + Key/Vertical Pass"
             value={String(backFootPassing.verticalPasses)}
             unit="vertical passes"
@@ -184,7 +182,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
             />
           </Section>
 
-          <Section phase="build-up" title="1v1 + Finishing" value={String(oneVoneFinishing.shots)} unit="shots">
+          <Section phase="finishing" title="1v1 + Finishing" value={String(oneVoneFinishing.shots)} unit="shots">
             <p className="spdf-note">
               {oneVoneFinishing.duelsWon} duels won · {oneVoneFinishing.goals} goal
               {oneVoneFinishing.goals === 1 ? "" : "s"}
@@ -192,7 +190,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
             <Bar label="Goals" value={oneVoneFinishing.goals} total={oneVoneFinishing.shots} tone="blue" />
           </Section>
 
-          <Section phase="build-up" title="Finishing" value={String(finishing.shots)} unit="shots">
+          <Section phase="finishing" title="Finishing" value={String(finishing.shots)} unit="shots">
             <Bar label="On target" value={finishing.onTarget} total={finishing.shots} tone="green" />
             <Bar label="Off target" value={finishing.offTarget} total={finishing.shots} tone="red" />
             <Bar label="Blocked" value={finishing.blocked} total={finishing.shots} tone="blue" />

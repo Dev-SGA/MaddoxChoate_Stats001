@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export type Phase = "build-up" | "defensive";
+export type Phase = "back-playing" | "finishing";
 
 export type Topic = {
   id: string;
@@ -12,8 +12,8 @@ export type Topic = {
 };
 
 const PHASE_LABEL: Record<Phase, string> = {
-  "build-up": "Build-Up",
-  defensive: "Defensive Phase",
+  "back-playing": "Back Playing",
+  finishing: "Finishing",
 };
 
 type TopicsBoardProps = {

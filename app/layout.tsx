@@ -3,8 +3,8 @@ import "./globals.css";
 import "./pdf.css";
 
 export const metadata: Metadata = {
-  title: "Ben Dezalovski — Game Stats | SGA Performance",
-  description: "Individual match statistics for Ben Dezalovski (Club Ohio).",
+  title: "Maddox Choate",
+  description: "Individual match statistics for Maddox Choate (Houston Dynamo).",
 };
 
 export const viewport = {

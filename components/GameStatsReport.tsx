@@ -86,7 +86,7 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
     {
       id: "back-foot-duels",
       title: "Back-Foot Duels",
-      phase: "defensive",
+      phase: "back-playing",
       content: (
         <BigStat
           value={String(backFootDuels.successfulPressure)}
@@ -98,7 +98,7 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
     {
       id: "back-foot-passing",
       title: "Back-Foot Play + Key/Vertical Pass",
-      phase: "build-up",
+      phase: "back-playing",
       content: (
         <>
           <MetricFlow
@@ -133,7 +133,7 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
     {
       id: "one-v-one-finishing",
       title: "1v1 + Finishing",
-      phase: "build-up",
+      phase: "finishing",
       content: (
         <>
           <MetricFlow
@@ -162,7 +162,7 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
     {
       id: "finishing",
       title: "Finishing",
-      phase: "build-up",
+      phase: "finishing",
       content: (
         <MetricFlow
           items={[
