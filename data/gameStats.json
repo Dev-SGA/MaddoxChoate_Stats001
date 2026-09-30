@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "title": "Stats Game Report",
+    "subtitle": "Individual match statistics"
+  },
+  "player": {
+    "name": "Maddox Choate",
+    "club": "Club Ohio",
+    "photo": "/player/maddox-choate.jpeg"
+  },
+  "backFootDuels": {
+    "successfulPressure": 8
+  },
+  "backFootPassing": {
+    "verticalPasses": 4,
+    "keyPasses": 1,
+    "correct": 3,
+    "wrong": 1,
+    "videoLink": ""
+  },
+  "oneVoneFinishing": {
+    "shots": 3,
+    "duelsWon": 4,
+    "goals": 1,
+    "videoLink": ""
+  },
+  "finishing": {
+    "shots": 5,
+    "onTarget": 3,
+    "offTarget": 1,
+    "blocked": 1
+  }
+}
