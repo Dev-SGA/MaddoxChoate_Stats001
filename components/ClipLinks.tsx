@@ -3,15 +3,15 @@
 import { useVideoLinks } from "@/components/VideoLinksContext";
 
 type ClipLinksProps = {
-  scope: "backToGoalPlay" | "oneVoneFinishing";
+  scope: "backToGoalPlay" | "finishing";
 };
 
 export function ClipLinks({ scope }: ClipLinksProps) {
-  const { backToGoalPlayVideoLink, setBackToGoalPlayVideoLink, oneVoneFinishingVideoLink, setOneVoneFinishingVideoLink } =
+  const { backToGoalPlayVideoLink, setBackToGoalPlayVideoLink, finishingVideoLink, setFinishingVideoLink } =
     useVideoLinks();
 
-  const url = scope === "backToGoalPlay" ? backToGoalPlayVideoLink : oneVoneFinishingVideoLink;
-  const setUrl = scope === "backToGoalPlay" ? setBackToGoalPlayVideoLink : setOneVoneFinishingVideoLink;
+  const url = scope === "backToGoalPlay" ? backToGoalPlayVideoLink : finishingVideoLink;
+  const setUrl = scope === "backToGoalPlay" ? setBackToGoalPlayVideoLink : setFinishingVideoLink;
   const trimmed = url.trim();
   const hasUrl = trimmed.length > 0;
 

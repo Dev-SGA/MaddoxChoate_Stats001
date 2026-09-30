@@ -17,7 +17,7 @@
     "keyPasses": 1,
     "completed": 3,
     "incomplete": 1,
-    "videoLink": ""
+    "videoLink": "https://drive.google.com/file/d/1RUGM5pSsSJ0MP2JMkX9Y17KBqHPTiOXo/view?usp=drive_link"
   },
   "oneVoneFinishing": {
     "shots": 3,
@@ -29,6 +29,7 @@
     "shots": 5,
     "onTarget": 3,
     "offTarget": 1,
-    "blocked": 1
+    "blocked": 1,
+    "videoLink": "https://drive.google.com/file/d/1n9Y_y0qkeonpGk7T6Mf3MkZ8Zkh1cqmO/view?usp=drive_link"
   }
 }

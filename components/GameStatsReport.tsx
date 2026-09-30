@@ -40,12 +40,14 @@ function StatPanel({
   description,
   tiles,
   rate,
+  goalHighlight,
 }: {
   value: number;
   unit: string;
   description?: string;
   tiles?: Tile[];
   rate?: Rate;
+  goalHighlight?: number;
 }) {
   const rateTotal = rate ? rate.segments.reduce((sum, segment) => sum + segment.value, 0) : 0;
 
@@ -72,6 +74,13 @@ function StatPanel({
           <p className="stat-panel__description">{description}</p>
         )}
       </div>
+
+      {goalHighlight !== undefined && goalHighlight > 0 ? (
+        <p className="stat-panel__goal">
+          <span className="stat-panel__goal-value">{goalHighlight}</span>
+          <span className="stat-panel__goal-label">{goalHighlight === 1 ? "Goal" : "Goals"}</span>
+        </p>
+      ) : null}
 
       {rate ? (
         <div className="rate">
@@ -116,7 +125,8 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
   const { player, backToGoalDuels, backToGoalPlay, oneVoneFinishing, finishing, meta } = stats;
 
   const passAttempts = backToGoalPlay.completed + backToGoalPlay.incomplete;
-  const missedShots = oneVoneFinishing.shots - oneVoneFinishing.goals;
+  const backToGoalDuelsNote =
+    "Successful playing with his back to goal — held the ball up and brought teammates into the attack.";
 
   const topics: Topic[] = [
     {
@@ -127,7 +137,7 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
         <StatPanel
           value={backToGoalDuels.heldOff}
           unit="Successful hold-ups"
-          description="Received with his back to goal, shielded the ball and held off the defender until support arrived."
+          description={backToGoalDuelsNote}
         />
       ),
     },
@@ -168,21 +178,9 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
           <StatPanel
             value={oneVoneFinishing.duelsWon}
             unit="1v1 duels won"
-            tiles={[
-              { label: "Shots", value: oneVoneFinishing.shots, detail: "After a 1v1" },
-              { label: "Goals", value: oneVoneFinishing.goals, tone: "positive" },
-            ]}
-            rate={{
-              label: "Conversion rate",
-              value: percent(oneVoneFinishing.goals, oneVoneFinishing.shots),
-              note: `${oneVoneFinishing.goals} ${oneVoneFinishing.goals === 1 ? "goal" : "goals"} from ${oneVoneFinishing.shots} shots`,
-              segments: [
-                { label: "Goals", value: oneVoneFinishing.goals, tone: "positive" },
-                { label: "No goal", value: missedShots, tone: "muted" },
-              ],
-            }}
+            tiles={[{ label: "Shots", value: oneVoneFinishing.shots, detail: "After a 1v1" }]}
+            goalHighlight={oneVoneFinishing.goals}
           />
-          <ClipLinks scope="oneVoneFinishing" />
         </>
       ),
     },
@@ -191,40 +189,43 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
       title: "Finishes in the Game",
       phase: "finishing",
       content: (
-        <StatPanel
-          value={finishing.shots}
-          unit="Total shots"
-          tiles={[
-            {
-              label: "On target",
-              value: finishing.onTarget,
-              tone: "positive",
-              detail: `${percent(finishing.onTarget, finishing.shots)}% of shots`,
-            },
-            {
-              label: "Off target",
-              value: finishing.offTarget,
-              tone: "negative",
-              detail: `${percent(finishing.offTarget, finishing.shots)}% of shots`,
-            },
-            {
-              label: "Blocked",
-              value: finishing.blocked,
-              tone: "muted",
-              detail: `${percent(finishing.blocked, finishing.shots)}% of shots`,
-            },
-          ]}
-          rate={{
-            label: "Shot accuracy",
-            value: percent(finishing.onTarget, finishing.shots),
-            note: `${finishing.onTarget} of ${finishing.shots} shots on target`,
-            segments: [
-              { label: "On target", value: finishing.onTarget, tone: "positive" },
-              { label: "Off target", value: finishing.offTarget, tone: "negative" },
-              { label: "Blocked", value: finishing.blocked, tone: "muted" },
-            ],
-          }}
-        />
+        <>
+          <StatPanel
+            value={finishing.shots}
+            unit="Total shots"
+            tiles={[
+              {
+                label: "On target",
+                value: finishing.onTarget,
+                tone: "positive",
+                detail: `${percent(finishing.onTarget, finishing.shots)}% of shots`,
+              },
+              {
+                label: "Off target",
+                value: finishing.offTarget,
+                tone: "negative",
+                detail: `${percent(finishing.offTarget, finishing.shots)}% of shots`,
+              },
+              {
+                label: "Blocked",
+                value: finishing.blocked,
+                tone: "muted",
+                detail: `${percent(finishing.blocked, finishing.shots)}% of shots`,
+              },
+            ]}
+            rate={{
+              label: "Shot accuracy",
+              value: percent(finishing.onTarget, finishing.shots),
+              note: `${finishing.onTarget} of ${finishing.shots} shots on target`,
+              segments: [
+                { label: "On target", value: finishing.onTarget, tone: "positive" },
+                { label: "Off target", value: finishing.offTarget, tone: "negative" },
+                { label: "Blocked", value: finishing.blocked, tone: "muted" },
+              ],
+            }}
+          />
+          <ClipLinks scope="finishing" />
+        </>
       ),
     },
   ];
@@ -232,7 +233,7 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
   return (
     <VideoLinksProvider
       initialBackToGoalPlayVideoLink={backToGoalPlay.videoLink}
-      initialOneVoneFinishingVideoLink={oneVoneFinishing.videoLink}
+      initialFinishingVideoLink={finishing.videoLink}
     >
       <SgaCornerBrand />
 

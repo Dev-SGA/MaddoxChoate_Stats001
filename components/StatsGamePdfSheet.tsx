@@ -106,16 +106,26 @@ function Section({
   );
 }
 
+function GoalHighlight({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <p className="spdf-goal">
+      <span className="spdf-goal__value">{count}</span>
+      <span className="spdf-goal__label">{count === 1 ? "Goal" : "Goals"}</span>
+    </p>
+  );
+}
+
 function PdfVideoLinks({
   backToGoalPlayVideoLink,
-  oneVoneFinishingVideoLink,
+  finishingVideoLink,
 }: {
   backToGoalPlayVideoLink: string;
-  oneVoneFinishingVideoLink: string;
+  finishingVideoLink: string;
 }) {
   const rows = [
     { label: "Back-to-goal play + key/vertical pass", url: backToGoalPlayVideoLink.trim() },
-    { label: "1v1 + finishing", url: oneVoneFinishingVideoLink.trim() },
+    { label: "Finishes in the Game", url: finishingVideoLink.trim() },
   ];
 
   return (
@@ -181,7 +191,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
             unit="Successful hold-ups"
             aside={
               <p className="spdf-note">
-                Received with his back to goal, shielded the ball and held off the defender until support arrived.
+                Successful playing with his back to goal — held the ball up and brought teammates into the attack.
               </p>
             }
           />
@@ -218,25 +228,8 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
             title="1v1 + Finishing"
             value={oneVoneFinishing.duelsWon}
             unit="1v1 duels won"
-            aside={
-              <StatTiles
-                items={[
-                  { label: "Shots", value: oneVoneFinishing.shots },
-                  { label: "Goals", value: oneVoneFinishing.goals, tone: "green" },
-                ]}
-              />
-            }
-            footer={
-              <RateBar
-                label="Conversion rate"
-                value={pct(oneVoneFinishing.goals, oneVoneFinishing.shots)}
-                note={`${oneVoneFinishing.goals} ${oneVoneFinishing.goals === 1 ? "goal" : "goals"} from ${oneVoneFinishing.shots} shots`}
-                segments={[
-                  { value: oneVoneFinishing.goals, tone: "green" },
-                  { value: oneVoneFinishing.shots - oneVoneFinishing.goals, tone: "grey" },
-                ]}
-              />
-            }
+            aside={<StatTiles items={[{ label: "Shots", value: oneVoneFinishing.shots }]} />}
+            footer={<GoalHighlight count={oneVoneFinishing.goals} />}
           />
 
           <Section
@@ -270,7 +263,7 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
 
         <PdfVideoLinks
           backToGoalPlayVideoLink={backToGoalPlay.videoLink}
-          oneVoneFinishingVideoLink={oneVoneFinishing.videoLink}
+          finishingVideoLink={finishing.videoLink}
         />
 
         <footer className="spdf-foot">

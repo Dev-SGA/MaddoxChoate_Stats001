@@ -32,6 +32,7 @@ export type GameStats = {
     onTarget: number;
     offTarget: number;
     blocked: number;
+    videoLink: string;
   };
 };
 

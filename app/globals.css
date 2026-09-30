@@ -565,6 +565,32 @@ body::before {
   color: var(--text-faint);
 }
 
+.stat-panel__goal {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--tone-positive) 35%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--tone-positive) 8%, transparent);
+}
+
+.stat-panel__goal-value {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--tone-positive);
+}
+
+.stat-panel__goal-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tone-positive);
+}
+
 .meter {
   display: flex;
   gap: 3px;
