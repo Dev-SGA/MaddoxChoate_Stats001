@@ -17,7 +17,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Edit `data/gameStats.json` to update stats and video links.
 
-Replace `public/player/maddox-choate.jpeg` with the athlete photo when available.
+Player photo: `public/player/maddox-choate.png`.
 
 ## Deploy
 

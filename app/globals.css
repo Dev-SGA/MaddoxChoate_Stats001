@@ -275,7 +275,7 @@ body::before {
   overflow: hidden;
 }
 
-.topic--back-playing {
+.topic--hold-up-play {
   --topic-color: var(--accent);
   background: color-mix(in srgb, var(--sga-blue) 14%, var(--surface));
 }
@@ -300,7 +300,7 @@ body::before {
   text-transform: uppercase;
 }
 
-.topic--back-playing .topic__phase {
+.topic--hold-up-play .topic__phase {
   color: var(--tone-accent);
 }
 

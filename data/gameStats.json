@@ -8,14 +8,14 @@
     "club": "Houston Dynamo",
     "photo": "/player/maddox-choate.png"
   },
-  "backFootDuels": {
-    "successfulPressure": 8
+  "backToGoalDuels": {
+    "heldOff": 8
   },
-  "backFootPassing": {
+  "backToGoalPlay": {
     "verticalPasses": 4,
     "keyPasses": 1,
-    "correct": 3,
-    "wrong": 1,
+    "completed": 3,
+    "incomplete": 1,
     "videoLink": ""
   },
   "oneVoneFinishing": {

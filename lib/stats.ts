@@ -10,14 +10,14 @@ export type GameStats = {
     club: string;
     photo: string;
   };
-  backFootDuels: {
-    successfulPressure: number;
+  backToGoalDuels: {
+    heldOff: number;
   };
-  backFootPassing: {
+  backToGoalPlay: {
     verticalPasses: number;
     keyPasses: number;
-    correct: number;
-    wrong: number;
+    completed: number;
+    incomplete: number;
     videoLink: string;
   };
   oneVoneFinishing: {

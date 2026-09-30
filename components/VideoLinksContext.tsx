@@ -4,8 +4,8 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from "re
 import type { GameStats } from "@/lib/stats";
 
 type VideoLinksContextValue = {
-  backFootPassingVideoLink: string;
-  setBackFootPassingVideoLink: (value: string) => void;
+  backToGoalPlayVideoLink: string;
+  setBackToGoalPlayVideoLink: (value: string) => void;
   oneVoneFinishingVideoLink: string;
   setOneVoneFinishingVideoLink: (value: string) => void;
   mergeIntoStats: (stats: GameStats) => GameStats;
@@ -14,34 +14,34 @@ type VideoLinksContextValue = {
 const VideoLinksContext = createContext<VideoLinksContextValue | null>(null);
 
 type VideoLinksProviderProps = {
-  initialBackFootPassingVideoLink: string;
+  initialBackToGoalPlayVideoLink: string;
   initialOneVoneFinishingVideoLink: string;
   children: ReactNode;
 };
 
 export function VideoLinksProvider({
-  initialBackFootPassingVideoLink,
+  initialBackToGoalPlayVideoLink,
   initialOneVoneFinishingVideoLink,
   children,
 }: VideoLinksProviderProps) {
-  const [backFootPassingVideoLink, setBackFootPassingVideoLink] = useState(initialBackFootPassingVideoLink);
+  const [backToGoalPlayVideoLink, setBackToGoalPlayVideoLink] = useState(initialBackToGoalPlayVideoLink);
   const [oneVoneFinishingVideoLink, setOneVoneFinishingVideoLink] = useState(initialOneVoneFinishingVideoLink);
 
   const value = useMemo<VideoLinksContextValue>(
     () => ({
-      backFootPassingVideoLink,
-      setBackFootPassingVideoLink,
+      backToGoalPlayVideoLink,
+      setBackToGoalPlayVideoLink,
       oneVoneFinishingVideoLink,
       setOneVoneFinishingVideoLink,
       mergeIntoStats(stats) {
         return {
           ...stats,
-          backFootPassing: { ...stats.backFootPassing, videoLink: backFootPassingVideoLink },
+          backToGoalPlay: { ...stats.backToGoalPlay, videoLink: backToGoalPlayVideoLink },
           oneVoneFinishing: { ...stats.oneVoneFinishing, videoLink: oneVoneFinishingVideoLink },
         };
       },
     }),
-    [backFootPassingVideoLink, oneVoneFinishingVideoLink],
+    [backToGoalPlayVideoLink, oneVoneFinishingVideoLink],
   );
 
   return <VideoLinksContext.Provider value={value}>{children}</VideoLinksContext.Provider>;

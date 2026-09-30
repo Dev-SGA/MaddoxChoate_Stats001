@@ -7,10 +7,12 @@ type StatsGamePdfSheetProps = {
   logoUrl: string;
 };
 
-type Phase = "back-playing" | "finishing";
+type Phase = "hold-up-play" | "finishing";
+
+type Tone = "blue" | "green" | "red" | "grey";
 
 const PHASE_LABEL: Record<Phase, string> = {
-  "back-playing": "Back Playing",
+  "hold-up-play": "Hold-Up Play",
   finishing: "Finishing",
 };
 
@@ -26,32 +28,49 @@ function linkHost(url: string): string {
   }
 }
 
-function Bar({
+function StatTiles({ items }: { items: { label: string; value: number; tone?: Tone }[] }) {
+  return (
+    <ul className="spdf-stats">
+      {items.map((item) => (
+        <li key={item.label} className="spdf-stat">
+          <span className={`spdf-stat__value${item.tone ? ` spdf-stat__value--${item.tone}` : ""}`}>{item.value}</span>
+          <span className="spdf-stat__label">{item.label}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function RateBar({
   label,
   value,
-  total,
-  tone,
-  detail,
+  note,
+  segments,
 }: {
   label: string;
   value: number;
-  total: number;
-  tone: "blue" | "green" | "red";
-  detail?: string;
+  note: string;
+  segments: { value: number; tone: Tone }[];
 }) {
-  const share = pct(value, total);
+  const total = segments.reduce((sum, segment) => sum + segment.value, 0);
   return (
-    <div className="spdf-bar">
-      <div className="spdf-bar__head">
-        <span className="spdf-bar__label">{label}</span>
-        <span className="spdf-bar__figure">
-          {detail ?? value}
-          <span className="spdf-bar__pct">{share}%</span>
-        </span>
+    <div className="spdf-rate">
+      <div className="spdf-rate__head">
+        <span className="spdf-rate__label">{label}</span>
+        <span className="spdf-rate__value">{value}%</span>
       </div>
-      <div className="spdf-bar__track">
-        <div className={`spdf-bar__fill spdf-bar__fill--${tone}`} style={{ width: `${share}%` }} />
+      <div className="spdf-rate__track">
+        {segments.map((segment, index) =>
+          segment.value > 0 ? (
+            <span
+              key={index}
+              className={`spdf-rate__seg spdf-rate__seg--${segment.tone}`}
+              style={{ width: `${pct(segment.value, total)}%` }}
+            />
+          ) : null,
+        )}
       </div>
+      <p className="spdf-rate__note">{note}</p>
     </div>
   );
 }
@@ -61,36 +80,41 @@ function Section({
   title,
   value,
   unit,
-  children,
+  aside,
+  footer,
 }: {
   phase: Phase;
   title: string;
-  value: string;
+  value: number;
   unit: string;
-  children?: React.ReactNode;
+  aside: React.ReactNode;
+  footer?: React.ReactNode;
 }) {
   return (
     <section className={`spdf-section spdf-section--${phase}`}>
       <p className="spdf-section__phase">{PHASE_LABEL[phase]}</p>
       <h3 className="spdf-section__title">{title}</h3>
-      <div className="spdf-section__kpi">
-        <span className="spdf-section__value">{value}</span>
-        <span className="spdf-section__unit">{unit}</span>
+      <div className="spdf-section__body">
+        <div className="spdf-section__kpi">
+          <span className="spdf-section__value">{value}</span>
+          <span className="spdf-section__unit">{unit}</span>
+        </div>
+        <div className="spdf-section__aside">{aside}</div>
       </div>
-      {children ? <div className="spdf-section__detail">{children}</div> : null}
+      {footer ? <div className="spdf-section__footer">{footer}</div> : null}
     </section>
   );
 }
 
 function PdfVideoLinks({
-  backFootPassingVideoLink,
+  backToGoalPlayVideoLink,
   oneVoneFinishingVideoLink,
 }: {
-  backFootPassingVideoLink: string;
+  backToGoalPlayVideoLink: string;
   oneVoneFinishingVideoLink: string;
 }) {
   const rows = [
-    { label: "Back-foot play + key/vertical pass", url: backFootPassingVideoLink.trim() },
+    { label: "Back-to-goal play + key/vertical pass", url: backToGoalPlayVideoLink.trim() },
     { label: "1v1 + finishing", url: oneVoneFinishingVideoLink.trim() },
   ];
 
@@ -121,8 +145,8 @@ function PdfVideoLinks({
 }
 
 export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfSheetProps) {
-  const { player, meta, backFootDuels, backFootPassing, oneVoneFinishing, finishing } = stats;
-  const passAttempts = backFootPassing.correct + backFootPassing.wrong;
+  const { player, meta, backToGoalDuels, backToGoalPlay, oneVoneFinishing, finishing } = stats;
+  const passAttempts = backToGoalPlay.completed + backToGoalPlay.incomplete;
 
   return (
     <article className="stats-pdf" aria-hidden="true">
@@ -151,54 +175,101 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
 
         <div className="spdf-grid">
           <Section
-            phase="back-playing"
-            title="Back-Foot Duels"
-            value={String(backFootDuels.successfulPressure)}
-            unit="successful holds"
-          >
-            <p className="spdf-note">Times successfully withstood back-foot pressure during the match.</p>
-          </Section>
+            phase="hold-up-play"
+            title="Back-to-Goal Duels"
+            value={backToGoalDuels.heldOff}
+            unit="Successful hold-ups"
+            aside={
+              <p className="spdf-note">
+                Received with his back to goal, shielded the ball and held off the defender until support arrived.
+              </p>
+            }
+          />
 
           <Section
-            phase="back-playing"
-            title="Back-Foot Play + Key/Vertical Pass"
-            value={String(backFootPassing.verticalPasses)}
-            unit="vertical passes"
-          >
-            <Bar label="Key passes" value={backFootPassing.keyPasses} total={backFootPassing.verticalPasses} tone="blue" />
-            <Bar
-              label="Correct"
-              value={backFootPassing.correct}
-              total={passAttempts}
-              detail={`${backFootPassing.correct}/${passAttempts}`}
-              tone="green"
-            />
-            <Bar
-              label="Wrong"
-              value={backFootPassing.wrong}
-              total={passAttempts}
-              detail={`${backFootPassing.wrong}/${passAttempts}`}
-              tone="red"
-            />
-          </Section>
+            phase="hold-up-play"
+            title="Back-to-Goal Play + Key/Vertical Pass"
+            value={backToGoalPlay.verticalPasses}
+            unit="Vertical passes"
+            aside={
+              <StatTiles
+                items={[
+                  { label: "Key passes", value: backToGoalPlay.keyPasses, tone: "blue" },
+                  { label: "Completed", value: backToGoalPlay.completed, tone: "green" },
+                  { label: "Incomplete", value: backToGoalPlay.incomplete, tone: "red" },
+                ]}
+              />
+            }
+            footer={
+              <RateBar
+                label="Pass completion"
+                value={pct(backToGoalPlay.completed, passAttempts)}
+                note={`${backToGoalPlay.completed} of ${passAttempts} passes completed`}
+                segments={[
+                  { value: backToGoalPlay.completed, tone: "green" },
+                  { value: backToGoalPlay.incomplete, tone: "red" },
+                ]}
+              />
+            }
+          />
 
-          <Section phase="finishing" title="1v1 + Finishing" value={String(oneVoneFinishing.shots)} unit="shots">
-            <p className="spdf-note">
-              {oneVoneFinishing.duelsWon} duels won · {oneVoneFinishing.goals} goal
-              {oneVoneFinishing.goals === 1 ? "" : "s"}
-            </p>
-            <Bar label="Goals" value={oneVoneFinishing.goals} total={oneVoneFinishing.shots} tone="blue" />
-          </Section>
+          <Section
+            phase="finishing"
+            title="1v1 + Finishing"
+            value={oneVoneFinishing.duelsWon}
+            unit="1v1 duels won"
+            aside={
+              <StatTiles
+                items={[
+                  { label: "Shots", value: oneVoneFinishing.shots },
+                  { label: "Goals", value: oneVoneFinishing.goals, tone: "green" },
+                ]}
+              />
+            }
+            footer={
+              <RateBar
+                label="Conversion rate"
+                value={pct(oneVoneFinishing.goals, oneVoneFinishing.shots)}
+                note={`${oneVoneFinishing.goals} ${oneVoneFinishing.goals === 1 ? "goal" : "goals"} from ${oneVoneFinishing.shots} shots`}
+                segments={[
+                  { value: oneVoneFinishing.goals, tone: "green" },
+                  { value: oneVoneFinishing.shots - oneVoneFinishing.goals, tone: "grey" },
+                ]}
+              />
+            }
+          />
 
-          <Section phase="finishing" title="Finishing" value={String(finishing.shots)} unit="shots">
-            <Bar label="On target" value={finishing.onTarget} total={finishing.shots} tone="green" />
-            <Bar label="Off target" value={finishing.offTarget} total={finishing.shots} tone="red" />
-            <Bar label="Blocked" value={finishing.blocked} total={finishing.shots} tone="blue" />
-          </Section>
+          <Section
+            phase="finishing"
+            title="Finishes in the Game"
+            value={finishing.shots}
+            unit="Total shots"
+            aside={
+              <StatTiles
+                items={[
+                  { label: "On target", value: finishing.onTarget, tone: "green" },
+                  { label: "Off target", value: finishing.offTarget, tone: "red" },
+                  { label: "Blocked", value: finishing.blocked },
+                ]}
+              />
+            }
+            footer={
+              <RateBar
+                label="Shot accuracy"
+                value={pct(finishing.onTarget, finishing.shots)}
+                note={`${finishing.onTarget} of ${finishing.shots} shots on target`}
+                segments={[
+                  { value: finishing.onTarget, tone: "green" },
+                  { value: finishing.offTarget, tone: "red" },
+                  { value: finishing.blocked, tone: "grey" },
+                ]}
+              />
+            }
+          />
         </div>
 
         <PdfVideoLinks
-          backFootPassingVideoLink={backFootPassing.videoLink}
+          backToGoalPlayVideoLink={backToGoalPlay.videoLink}
           oneVoneFinishingVideoLink={oneVoneFinishing.videoLink}
         />
 

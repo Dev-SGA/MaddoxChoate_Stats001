@@ -77,56 +77,58 @@ function BigStat({ value, caption, tone }: { value: string; caption: string; ton
 }
 
 export function GameStatsReport({ stats }: GameStatsReportProps) {
-  const { player, backFootDuels, backFootPassing, oneVoneFinishing, finishing, meta } = stats;
+  const { player, backToGoalDuels, backToGoalPlay, oneVoneFinishing, finishing, meta } = stats;
 
-  const passAttempts = backFootPassing.correct + backFootPassing.wrong;
-  const passAccuracy = percent(backFootPassing.correct, passAttempts);
+  const passAttempts = backToGoalPlay.completed + backToGoalPlay.incomplete;
+  const passCompletion = percent(backToGoalPlay.completed, passAttempts);
+  const conversionRate = percent(oneVoneFinishing.goals, oneVoneFinishing.shots);
+  const shotAccuracy = percent(finishing.onTarget, finishing.shots);
 
   const topics: Topic[] = [
     {
-      id: "back-foot-duels",
-      title: "Back-Foot Duels",
-      phase: "back-playing",
+      id: "back-to-goal-duels",
+      title: "Back-to-Goal Duels",
+      phase: "hold-up-play",
       content: (
         <BigStat
-          value={String(backFootDuels.successfulPressure)}
-          caption="Times successfully withstood back-foot pressure during the match"
+          value={String(backToGoalDuels.heldOff)}
+          caption="Times he received with his back to goal, shielded the ball and held off the defender"
           tone="positive"
         />
       ),
     },
     {
-      id: "back-foot-passing",
-      title: "Back-Foot Play + Key/Vertical Pass",
-      phase: "back-playing",
+      id: "back-to-goal-play",
+      title: "Back-to-Goal Play + Key/Vertical Pass",
+      phase: "hold-up-play",
       content: (
         <>
           <MetricFlow
             items={[
               <div key="vertical" className="metric-card metric-card--hero">
                 <h3 className="metric-card__title">Vertical passes</h3>
-                <span className="metric-card__value">{backFootPassing.verticalPasses}</span>
-                <p className="metric-card__caption">Vertical passes from back-foot situations</p>
+                <span className="metric-card__value">{backToGoalPlay.verticalPasses}</span>
+                <p className="metric-card__caption">Played forward after holding the ball up with his back to goal</p>
               </div>,
               <div key="key" className="metric-card">
                 <h3 className="metric-card__title">Key passes</h3>
-                <span className="metric-card__value">{backFootPassing.keyPasses}</span>
-                <p className="metric-card__caption">Passes that created a clear scoring opportunity</p>
+                <span className="metric-card__value">{backToGoalPlay.keyPasses}</span>
+                <p className="metric-card__caption">Lay-offs that set up a clear scoring chance</p>
               </div>,
               <SplitMeter
-                key="accuracy"
-                title="Pass outcome"
-                headline={`${backFootPassing.correct} of ${passAttempts} · ${passAccuracy}%`}
-                primary={backFootPassing.correct}
-                secondary={backFootPassing.wrong}
-                primaryLabel="Correct"
-                secondaryLabel="Wrong"
+                key="completion"
+                title="Pass completion"
+                headline={`${backToGoalPlay.completed} of ${passAttempts} · ${passCompletion}%`}
+                primary={backToGoalPlay.completed}
+                secondary={backToGoalPlay.incomplete}
+                primaryLabel="Completed"
+                secondaryLabel="Incomplete"
                 primaryTone="positive"
                 secondaryTone="negative"
               />,
             ]}
           />
-          <ClipLinks scope="backFootPassing" />
+          <ClipLinks scope="backToGoalPlay" />
         </>
       ),
     },
@@ -138,20 +140,20 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
         <>
           <MetricFlow
             items={[
-              <div key="shots" className="metric-card metric-card--hero">
+              <div key="duels" className="metric-card metric-card--hero">
+                <h3 className="metric-card__title">1v1 duels won</h3>
+                <span className="metric-card__value">{oneVoneFinishing.duelsWon}</span>
+                <p className="metric-card__caption">Beat his direct opponent in 1v1 situations</p>
+              </div>,
+              <div key="shots" className="metric-card">
                 <h3 className="metric-card__title">Shots</h3>
                 <span className="metric-card__value">{oneVoneFinishing.shots}</span>
-                <p className="metric-card__caption">Shots taken from 1v1 situations</p>
-              </div>,
-              <div key="duels" className="metric-card">
-                <h3 className="metric-card__title">Duels won</h3>
-                <span className="metric-card__value">{oneVoneFinishing.duelsWon}</span>
-                <p className="metric-card__caption">1v1 duels won in the match</p>
+                <p className="metric-card__caption">Shots taken after a 1v1</p>
               </div>,
               <div key="goals" className="metric-card">
                 <h3 className="metric-card__title">Goals</h3>
                 <span className="metric-card__value">{oneVoneFinishing.goals}</span>
-                <p className="metric-card__caption">Goals scored from 1v1 situations</p>
+                <span className="metric-card__pct">{conversionRate}% conversion rate</span>
               </div>,
             ]}
           />
@@ -160,16 +162,16 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
       ),
     },
     {
-      id: "finishing",
-      title: "Finishing",
+      id: "finishes-in-the-game",
+      title: "Finishes in the Game",
       phase: "finishing",
       content: (
         <MetricFlow
           items={[
             <div key="total" className="metric-card metric-card--hero">
-              <h3 className="metric-card__title">Shots</h3>
+              <h3 className="metric-card__title">Total shots</h3>
               <span className="metric-card__value">{finishing.shots}</span>
-              <p className="metric-card__caption">Total finishing attempts in the match</p>
+              <p className="metric-card__caption">{shotAccuracy}% shot accuracy</p>
             </div>,
             <div key="on-target" className="metric-card">
               <h3 className="metric-card__title">On target</h3>
@@ -194,7 +196,7 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
 
   return (
     <VideoLinksProvider
-      initialBackFootPassingVideoLink={backFootPassing.videoLink}
+      initialBackToGoalPlayVideoLink={backToGoalPlay.videoLink}
       initialOneVoneFinishingVideoLink={oneVoneFinishing.videoLink}
     >
       <SgaCornerBrand />
