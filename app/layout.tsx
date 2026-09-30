@@ -3,7 +3,7 @@ import "./globals.css";
 import "./pdf.css";
 
 export const metadata: Metadata = {
-  title: "Maddox Choate",
+  title: "Maddox Choate — Game Stats | SGA Performance",
   description: "Individual match statistics for Maddox Choate (Houston Dynamo).",
 };
 
