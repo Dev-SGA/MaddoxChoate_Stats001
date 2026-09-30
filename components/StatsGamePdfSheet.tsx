@@ -28,11 +28,11 @@ function linkHost(url: string): string {
   }
 }
 
-function StatTiles({ items }: { items: { label: string; value: number; tone?: Tone }[] }) {
+function StatTiles({ items }: { items: { label: string; value: number; tone?: Tone; highlight?: boolean }[] }) {
   return (
     <ul className="spdf-stats">
       {items.map((item) => (
-        <li key={item.label} className="spdf-stat">
+        <li key={item.label} className={`spdf-stat${item.highlight ? " spdf-stat--highlight" : ""}`}>
           <span className={`spdf-stat__value${item.tone ? ` spdf-stat__value--${item.tone}` : ""}`}>{item.value}</span>
           <span className="spdf-stat__label">{item.label}</span>
         </li>
@@ -103,16 +103,6 @@ function Section({
       </div>
       {footer ? <div className="spdf-section__footer">{footer}</div> : null}
     </section>
-  );
-}
-
-function GoalHighlight({ count }: { count: number }) {
-  if (count <= 0) return null;
-  return (
-    <p className="spdf-goal">
-      <span className="spdf-goal__value">{count}</span>
-      <span className="spdf-goal__label">{count === 1 ? "Goal" : "Goals"}</span>
-    </p>
   );
 }
 
@@ -228,8 +218,19 @@ export function StatsGamePdfSheet({ stats, photoUrl, logoUrl }: StatsGamePdfShee
             title="1v1 + Finishing"
             value={oneVoneFinishing.duelsWon}
             unit="1v1 duels won"
-            aside={<StatTiles items={[{ label: "Shots", value: oneVoneFinishing.shots }]} />}
-            footer={<GoalHighlight count={oneVoneFinishing.goals} />}
+            aside={
+              <StatTiles
+                items={[
+                  { label: "Shots", value: oneVoneFinishing.shots },
+                  {
+                    label: oneVoneFinishing.goals === 1 ? "Goal" : "Goals",
+                    value: oneVoneFinishing.goals,
+                    tone: "green",
+                    highlight: true,
+                  },
+                ]}
+              />
+            }
           />
 
           <Section

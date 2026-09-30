@@ -25,6 +25,7 @@ type Tile = {
   value: number;
   tone?: Tone;
   detail?: string;
+  highlight?: boolean;
 };
 
 type Rate = {
@@ -40,14 +41,12 @@ function StatPanel({
   description,
   tiles,
   rate,
-  goalHighlight,
 }: {
   value: number;
   unit: string;
   description?: string;
   tiles?: Tile[];
   rate?: Rate;
-  goalHighlight?: number;
 }) {
   const rateTotal = rate ? rate.segments.reduce((sum, segment) => sum + segment.value, 0) : 0;
 
@@ -61,7 +60,7 @@ function StatPanel({
         {tiles ? (
           <ul className="stat-tiles">
             {tiles.map((tile) => (
-              <li key={tile.label} className="stat-tile">
+              <li key={tile.label} className={`stat-tile${tile.highlight ? " stat-tile--highlight" : ""}`}>
                 <span className={`stat-tile__value${tile.tone ? ` stat-tile__value--${tile.tone}` : ""}`}>
                   {tile.value}
                 </span>
@@ -74,13 +73,6 @@ function StatPanel({
           <p className="stat-panel__description">{description}</p>
         )}
       </div>
-
-      {goalHighlight !== undefined && goalHighlight > 0 ? (
-        <p className="stat-panel__goal">
-          <span className="stat-panel__goal-value">{goalHighlight}</span>
-          <span className="stat-panel__goal-label">{goalHighlight === 1 ? "Goal" : "Goals"}</span>
-        </p>
-      ) : null}
 
       {rate ? (
         <div className="rate">
@@ -178,8 +170,15 @@ export function GameStatsReport({ stats }: GameStatsReportProps) {
           <StatPanel
             value={oneVoneFinishing.duelsWon}
             unit="1v1 duels won"
-            tiles={[{ label: "Shots", value: oneVoneFinishing.shots, detail: "After a 1v1" }]}
-            goalHighlight={oneVoneFinishing.goals}
+            tiles={[
+              { label: "Shots", value: oneVoneFinishing.shots, detail: "After a 1v1" },
+              {
+                label: oneVoneFinishing.goals === 1 ? "Goal" : "Goals",
+                value: oneVoneFinishing.goals,
+                tone: "positive",
+                highlight: true,
+              },
+            ]}
           />
         </>
       ),

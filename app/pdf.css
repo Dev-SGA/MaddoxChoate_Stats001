@@ -400,29 +400,12 @@
   color: #56697a;
 }
 
-.spdf-goal {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
-  margin: 0;
-  padding: 6px 12px;
-  border: 1px solid #b9dfc9;
-  border-radius: 6px;
-  background: #f4fbf6;
+.spdf-stat--highlight {
+  border-color: #b9dfc9;
+  background: #f1faf4;
 }
 
-.spdf-goal__value {
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 1;
-  color: #05712d;
-}
-
-.spdf-goal__label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.spdf-stat--highlight .spdf-stat__label {
   color: #05712d;
 }
 
