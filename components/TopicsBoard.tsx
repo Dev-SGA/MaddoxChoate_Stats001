@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export type Phase = "hold-up-play" | "finishing";
+export type Phase = "hold-up-play" | "attacking" | "finishing";
 
 export type Topic = {
   id: string;
@@ -13,6 +13,7 @@ export type Topic = {
 
 const PHASE_LABEL: Record<Phase, string> = {
   "hold-up-play": "Hold-Up Play",
+  attacking: "Attacking Phase",
   finishing: "Finishing",
 };
 
