@@ -97,11 +97,11 @@ function HeroCard({
   );
 }
 
-function MiniCard({ title, value, note }: { title: string; value: number; note?: string }) {
+function MiniCard({ title, value, note }: { title: string; value: number | string; note?: string }) {
   return (
     <div className="metric-card metric-card--mini">
       <h3 className="metric-card__title">{title}</h3>
-      <span className="metric-card__value">{formatCount(value)}</span>
+      <span className="metric-card__value">{typeof value === "number" ? formatCount(value) : value}</span>
       {note ? <span className="metric-card__pct">{note}</span> : null}
     </div>
   );
@@ -136,6 +136,10 @@ function StatRow({ hero, cards }: { hero: React.ReactNode; cards: React.ReactNod
       </div>
     </div>
   );
+}
+
+function StatCol({ children }: { children: React.ReactNode }) {
+  return <div className="conn-layout__col">{children}</div>;
 }
 
 function MatchSwitcher({
@@ -251,57 +255,56 @@ function buildTopics(match: MatchStats): Topic[] {
 
   if (duels1v1) {
     const goalNote = duels1v1.goals === 1 ? "1v1 ended in a goal" : "1v1s ended in a goal";
+    const progressed = duels1v1.progressedToGoal ?? 0;
+    const wonNoProgression = duels1v1.wonNoProgression ?? 0;
+    const positiveBreakdown: React.ReactNode[] = [
+      wonNoProgression > 0 ? (
+        <BigStat
+          key="won-no-prog"
+          tag="Positive Play"
+          value={formatCount(wonNoProgression)}
+          caption="Won the duel, but the play didn't progress"
+          tone="accent"
+        />
+      ) : null,
+      progressed > 0 ? (
+        <BigStat
+          key="progressed"
+          tag="Goal"
+          value={formatCount(progressed)}
+          caption={progressed === 1 ? "Progressed → ended in a goal" : "Progressed → ended in goals"}
+          tone="positive"
+        />
+      ) : null,
+      progressed === 0 && duels1v1.goals > 0 ? (
+        <BigStat key="goal" tag="Goal" value={formatCount(duels1v1.goals)} caption={goalNote} tone="positive" />
+      ) : null,
+    ].filter(Boolean);
+
     topics.push({
       id: "duels-1v1",
       title: "1v1 — Offensive Duels",
       phase: "attacking",
       content: (
-        <StatRow
-          hero={
+        <div className="conn-layout">
+          <StatCol>
             <HeroCard
               title="Offensive duels"
               value={duels1v1.total}
               caption="1v1 situations attacking a defender"
               href={linkOf(duels1v1)}
             />
-          }
-          cards={[
             <OutcomeMeter
-              key="outcome"
               title="Duel outcome"
               headline={`${formatCount(duels1v1.positive)} of ${formatCount(duels1v1.total)} · ${percent(duels1v1.positive, duels1v1.total)}%`}
               segments={[
                 { label: "Positive Plays", value: duels1v1.positive, tone: "positive" },
                 { label: "Negative Plays", value: duels1v1.negative, tone: "warn" },
               ]}
-            />,
-            ...(duels1v1.progressedToGoal && duels1v1.progressedToGoal > 0
-              ? [
-                  <BigStat
-                    key="progressed"
-                    tag="Goal"
-                    value={formatCount(duels1v1.progressedToGoal)}
-                    caption={duels1v1.progressedToGoal === 1 ? "Progressed → ended in a goal" : "Progressed → ended in goals"}
-                    tone="positive"
-                  />,
-                ]
-              : []),
-            ...(duels1v1.wonNoProgression && duels1v1.wonNoProgression > 0
-              ? [
-                  <BigStat
-                    key="won-no-prog"
-                    tag="Positive Play"
-                    value={formatCount(duels1v1.wonNoProgression)}
-                    caption="Won the duel, but the play didn't progress"
-                    tone="accent"
-                  />,
-                ]
-              : []),
-            ...(duels1v1.goals > 0 && !(duels1v1.progressedToGoal && duels1v1.progressedToGoal > 0)
-              ? [<BigStat key="goal" tag="Goal" value={formatCount(duels1v1.goals)} caption={goalNote} tone="positive" />]
-              : []),
-          ]}
-        />
+            />
+          </StatCol>
+          {positiveBreakdown.length > 0 ? <StatCol>{positiveBreakdown}</StatCol> : null}
+        </div>
       ),
     });
   }
@@ -312,31 +315,25 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Runs in Behind",
       phase: "attacking",
       content: (
-        <StatRow
-          hero={
-            <HeroCard
-              title="Runs in behind"
-              value={runsInBehind.runs}
-              caption="Off-ball runs in behind the defensive line"
-              href={linkOf(runsInBehind)}
+        <div className="conn-side__grid">
+          <HeroCard
+            title="Runs in behind"
+            value={runsInBehind.runs}
+            caption="Off-ball runs in behind the defensive line"
+            href={linkOf(runsInBehind)}
+          />
+          <MiniCard title="Passes received" value={runsInBehind.received} note="Found by a teammate" />
+          {runsInBehind.goals > 0 ? (
+            <BigStat
+              tag="Goal"
+              value={formatCount(runsInBehind.goals)}
+              caption="Run generated a shot — scored"
+              tone="positive"
             />
-          }
-          cards={[
-            <MiniCard key="received" title="Passes received" value={runsInBehind.received} note="Found by a teammate" />,
-            <MiniCard key="shot" title="Shot generated" value={runsInBehind.shots} note="From a run in behind" />,
-            ...(runsInBehind.goals > 0
-              ? [
-                  <BigStat
-                    key="goal"
-                    tag="Goal"
-                    value={formatCount(runsInBehind.goals)}
-                    caption={runsInBehind.goals === 1 ? "Scored after the run" : "Scored after runs"}
-                    tone="positive"
-                  />,
-                ]
-              : []),
-          ]}
-        />
+          ) : (
+            <MiniCard title="Shot generated" value={runsInBehind.shots} note="From a run in behind" />
+          )}
+        </div>
       ),
     });
   }
@@ -347,33 +344,22 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Passing",
       phase: "attacking",
       content: (
-        <StatRow
-          hero={
-            <HeroCard
-              title="Final-third passes"
-              value={passing.finalThird}
-              caption="Passes played in the attacking third"
-              href={linkOf(passing)}
-            />
-          }
-          cards={[
+        <div className="conn-layout">
+          <HeroCard
+            title="Final-third passes"
+            value={passing.finalThird}
+            caption="Passes played in the attacking third"
+            href={linkOf(passing)}
+          />
+          <StatCol>
+            <MiniCard title="Passes into the box" value={passing.intoBox} note="Delivered into the penalty area" />
             <MiniCard
-              key="into-box"
-              title="Passes into the box"
-              value={passing.intoBox}
-              note={`${percent(passing.intoBox, passing.finalThird)}% of final-third passes`}
-            />,
-            <OutcomeMeter
-              key="box-share"
-              title="Into the box"
-              headline={`${percent(passing.intoBox, passing.finalThird)}%`}
-              segments={[
-                { label: "Into the box", value: passing.intoBox, tone: "accent" },
-                { label: "Other final-third", value: passing.finalThird - passing.intoBox, tone: "muted" },
-              ]}
-            />,
-          ]}
-        />
+              title="Into the box share"
+              value={`${percent(passing.intoBox, passing.finalThird)}%`}
+              note="of final-third passes into the box"
+            />
+          </StatCol>
+        </div>
       ),
     });
   }

@@ -877,6 +877,19 @@ body::before {
   min-width: 0;
 }
 
+.conn-layout__col {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 240px;
+}
+
+.conn-layout__col > * {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
 .conn-top {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
