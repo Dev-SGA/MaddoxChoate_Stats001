@@ -49,7 +49,9 @@
         "total": 10,
         "positive": 2,
         "negative": 8,
-        "goals": 1
+        "goals": 1,
+        "progressedToGoal": 1,
+        "wonNoProgression": 1
       },
       "runsInBehind": {
         "runs": 7,

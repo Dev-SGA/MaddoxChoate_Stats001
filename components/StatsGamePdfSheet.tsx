@@ -233,7 +233,15 @@ export function StatsGamePdfSheet({
       { label: "Positive Plays", value: duels1v1.positive, tone: "green" as Tone },
       { label: "Negative Plays", value: duels1v1.negative, tone: "amber" as Tone },
     ];
-    if (duels1v1.goals > 0) duelTiles.push({ label: "Ended in a goal", value: duels1v1.goals, tone: "blue" });
+    if (duels1v1.progressedToGoal && duels1v1.progressedToGoal > 0) {
+      duelTiles.push({ label: "Progressed → goal", value: duels1v1.progressedToGoal, tone: "blue" });
+    }
+    if (duels1v1.wonNoProgression && duels1v1.wonNoProgression > 0) {
+      duelTiles.push({ label: "Won · no progression", value: duels1v1.wonNoProgression, tone: "grey" });
+    }
+    if (duels1v1.goals > 0 && !(duels1v1.progressedToGoal && duels1v1.progressedToGoal > 0)) {
+      duelTiles.push({ label: "Ended in a goal", value: duels1v1.goals, tone: "blue" });
+    }
     sections.push(
       <Section
         key="duels-1v1"

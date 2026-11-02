@@ -33,6 +33,10 @@ export type Duels1v1 = {
   negative: number;
   /** Duels that ended in a goal. */
   goals: number;
+  /** Positive plays where the duel progressed the attack and ended in a goal. */
+  progressedToGoal?: number;
+  /** Positive plays won but without progression afterwards. */
+  wonNoProgression?: number;
   videoLink?: string;
 };
 

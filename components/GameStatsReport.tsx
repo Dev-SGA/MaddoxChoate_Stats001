@@ -5,7 +5,6 @@ import { AthleteProfileCard } from "@/components/AthleteProfileCard";
 import { ExportPdfButton } from "@/components/ExportPdfButton";
 import { ClipAnchor, ClipLegendLabel, ClipMetricTitle } from "@/components/ClipUi";
 import { VideoLinksProvider } from "@/components/VideoLinksContext";
-import { MetricFlow } from "@/components/MetricFlow";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
@@ -108,11 +107,33 @@ function MiniCard({ title, value, note }: { title: string; value: number; note?:
   );
 }
 
-function BigStat({ value, caption, tone }: { value: string; caption: string; tone: "positive" | "warn" }) {
+function BigStat({
+  value,
+  caption,
+  tone,
+  tag,
+}: {
+  value: string;
+  caption: string;
+  tone: "positive" | "warn" | "accent";
+  tag?: string;
+}) {
   return (
     <div className={`big-stat big-stat--${tone}`}>
+      {tag ? <span className="big-stat__tag">{tag}</span> : null}
       <span className="big-stat__value">{value}</span>
       <p className="big-stat__caption">{caption}</p>
+    </div>
+  );
+}
+
+function StatRow({ hero, cards }: { hero: React.ReactNode; cards: React.ReactNode[] }) {
+  return (
+    <div className="conn-layout">
+      {hero}
+      <div className="conn-side">
+        <div className="conn-side__grid">{cards}</div>
+      </div>
     </div>
   );
 }
@@ -202,15 +223,16 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Back-to-Goal Play + Key/Vertical Pass",
       phase: "hold-up-play",
       content: (
-        <MetricFlow
-          items={[
+        <StatRow
+          hero={
             <HeroCard
-              key="vertical"
               title="Vertical passes"
               value={backToGoalPlay.verticalPasses}
               caption="Forward passes that broke a line while playing back to goal"
               href={linkOf(backToGoalPlay)}
-            />,
+            />
+          }
+          cards={[
             <MiniCard key="key" title="Key passes" value={backToGoalPlay.keyPasses} note="Set up a clear chance" />,
             <OutcomeMeter
               key="completion"
@@ -234,15 +256,16 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "1v1 — Offensive Duels",
       phase: "attacking",
       content: (
-        <MetricFlow
-          items={[
+        <StatRow
+          hero={
             <HeroCard
-              key="duels"
               title="Offensive duels"
               value={duels1v1.total}
               caption="1v1 situations attacking a defender"
               href={linkOf(duels1v1)}
-            />,
+            />
+          }
+          cards={[
             <OutcomeMeter
               key="outcome"
               title="Duel outcome"
@@ -252,8 +275,30 @@ function buildTopics(match: MatchStats): Topic[] {
                 { label: "Negative Plays", value: duels1v1.negative, tone: "warn" },
               ]}
             />,
-            ...(duels1v1.goals > 0
-              ? [<BigStat key="goal" value={formatCount(duels1v1.goals)} caption={goalNote} tone="positive" />]
+            ...(duels1v1.progressedToGoal && duels1v1.progressedToGoal > 0
+              ? [
+                  <BigStat
+                    key="progressed"
+                    tag="Goal"
+                    value={formatCount(duels1v1.progressedToGoal)}
+                    caption={duels1v1.progressedToGoal === 1 ? "Progressed → ended in a goal" : "Progressed → ended in goals"}
+                    tone="positive"
+                  />,
+                ]
+              : []),
+            ...(duels1v1.wonNoProgression && duels1v1.wonNoProgression > 0
+              ? [
+                  <BigStat
+                    key="won-no-prog"
+                    tag="Positive Play"
+                    value={formatCount(duels1v1.wonNoProgression)}
+                    caption="Won the duel, but the play didn't progress"
+                    tone="accent"
+                  />,
+                ]
+              : []),
+            ...(duels1v1.goals > 0 && !(duels1v1.progressedToGoal && duels1v1.progressedToGoal > 0)
+              ? [<BigStat key="goal" tag="Goal" value={formatCount(duels1v1.goals)} caption={goalNote} tone="positive" />]
               : []),
           ]}
         />
@@ -267,23 +312,25 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Runs in Behind",
       phase: "attacking",
       content: (
-        <MetricFlow
-          items={[
+        <StatRow
+          hero={
             <HeroCard
-              key="runs"
               title="Runs in behind"
               value={runsInBehind.runs}
               caption="Off-ball runs in behind the defensive line"
               href={linkOf(runsInBehind)}
-            />,
+            />
+          }
+          cards={[
             <MiniCard key="received" title="Passes received" value={runsInBehind.received} note="Found by a teammate" />,
             <MiniCard key="shot" title="Shot generated" value={runsInBehind.shots} note="From a run in behind" />,
             ...(runsInBehind.goals > 0
               ? [
                   <BigStat
                     key="goal"
+                    tag="Goal"
                     value={formatCount(runsInBehind.goals)}
-                    caption={runsInBehind.goals === 1 ? "Goal scored" : "Goals scored"}
+                    caption={runsInBehind.goals === 1 ? "Scored after the run" : "Scored after runs"}
                     tone="positive"
                   />,
                 ]
@@ -300,20 +347,30 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Passing",
       phase: "attacking",
       content: (
-        <MetricFlow
-          items={[
+        <StatRow
+          hero={
             <HeroCard
-              key="final-third"
               title="Final-third passes"
               value={passing.finalThird}
               caption="Passes played in the attacking third"
               href={linkOf(passing)}
-            />,
+            />
+          }
+          cards={[
             <MiniCard
               key="into-box"
               title="Passes into the box"
               value={passing.intoBox}
               note={`${percent(passing.intoBox, passing.finalThird)}% of final-third passes`}
+            />,
+            <OutcomeMeter
+              key="box-share"
+              title="Into the box"
+              headline={`${percent(passing.intoBox, passing.finalThird)}%`}
+              segments={[
+                { label: "Into the box", value: passing.intoBox, tone: "accent" },
+                { label: "Other final-third", value: passing.finalThird - passing.intoBox, tone: "muted" },
+              ]}
             />,
           ]}
         />
@@ -327,22 +384,24 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "1v1 + Finishing",
       phase: "finishing",
       content: (
-        <MetricFlow
-          items={[
+        <StatRow
+          hero={
             <HeroCard
-              key="duels-won"
               title="1v1 duels won"
               value={oneVoneFinishing.duelsWon}
               caption="Duels won that created a shooting chance"
               href={linkOf(oneVoneFinishing)}
-            />,
+            />
+          }
+          cards={[
             <MiniCard key="shots" title="Shots after a 1v1" value={oneVoneFinishing.shots} />,
             ...(oneVoneFinishing.goals > 0
               ? [
                   <BigStat
                     key="goal"
+                    tag="Goal"
                     value={formatCount(oneVoneFinishing.goals)}
-                    caption={oneVoneFinishing.goals === 1 ? "Goal" : "Goals"}
+                    caption={oneVoneFinishing.goals === 1 ? "Scored from a 1v1" : "Scored from 1v1s"}
                     tone="positive"
                   />,
                 ]
@@ -369,15 +428,16 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Finishing",
       phase: "finishing",
       content: (
-        <MetricFlow
-          items={[
+        <StatRow
+          hero={
             <HeroCard
-              key="shots"
               title="Total shots"
               value={finishing.shots}
               caption="All finishing attempts in the match"
               href={linkOf(finishing)}
-            />,
+            />
+          }
+          cards={[
             <OutcomeMeter
               key="accuracy"
               title="Shot outcome"
@@ -385,7 +445,15 @@ function buildTopics(match: MatchStats): Topic[] {
               segments={segments}
             />,
             ...(goals > 0
-              ? [<BigStat key="goal" value={formatCount(goals)} caption={goals === 1 ? "Goal" : "Goals"} tone="positive" />]
+              ? [
+                  <BigStat
+                    key="goal"
+                    tag="Goal"
+                    value={formatCount(goals)}
+                    caption={`${formatCount(goals)} of ${formatCount(finishing.onTarget)} shots on target scored`}
+                    tone="positive"
+                  />,
+                ]
               : []),
           ]}
         />
@@ -448,7 +516,7 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
           <main className="report-main">
             <div className="view-panel">
               <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
-              <TopicsBoard topics={topics} />
+              <TopicsBoard key={match.id} topics={topics} />
             </div>
           </main>
         </div>

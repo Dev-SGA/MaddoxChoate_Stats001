@@ -22,7 +22,7 @@ type TopicsBoardProps = {
 };
 
 export function TopicsBoard({ topics }: TopicsBoardProps) {
-  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set());
+  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set(topics.length ? [topics[0].id] : []));
   const allOpen = openIds.size === topics.length;
 
   function toggle(id: string) {
