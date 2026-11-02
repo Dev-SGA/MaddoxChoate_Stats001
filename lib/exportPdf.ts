@@ -58,7 +58,7 @@ export async function exportStatsSlideToPdf(element: HTMLElement, filename: stri
     width: PDF_SLIDE_WIDTH,
     height: PDF_SLIDE_HEIGHT,
     useCORS: true,
-    backgroundColor: "#072334",
+    backgroundColor: "#ffffff",
     logging: false,
   });
 
