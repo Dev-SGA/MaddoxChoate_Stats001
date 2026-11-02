@@ -46,9 +46,9 @@
       "shortLabel": "Houston Rangers",
       "logo": "/clubs/houston-rangers.png",
       "duels1v1": {
-        "total": 10,
+        "total": 12,
         "positive": 2,
-        "negative": 8,
+        "negative": 10,
         "goals": 1,
         "progressedToGoal": 1,
         "wonNoProgression": 1

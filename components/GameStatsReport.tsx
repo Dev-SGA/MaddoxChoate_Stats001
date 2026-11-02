@@ -135,7 +135,7 @@ function BigStat({
 }: {
   value: string;
   caption: string;
-  tone: "positive" | "warn" | "accent";
+  tone: "positive" | "warn" | "accent" | "gold";
   tag?: string;
 }) {
   return (
@@ -279,28 +279,27 @@ function buildTopics(match: MatchStats): Topic[] {
   if (duels1v1) {
     const goalNote = duels1v1.goals === 1 ? "1v1 ended in a goal" : "1v1s ended in a goal";
     const progressed = duels1v1.progressedToGoal ?? 0;
-    const wonNoProgression = duels1v1.wonNoProgression ?? 0;
     const positiveBreakdown: React.ReactNode[] = [
-      wonNoProgression > 0 ? (
+      duels1v1.positive > 0 ? (
         <BigStat
-          key="won-no-prog"
-          tag="Positive Play"
-          value={formatCount(wonNoProgression)}
-          caption="Won the duel, but the play didn't progress"
+          key="positive"
+          tag="Positive Plays"
+          value={formatCount(duels1v1.positive)}
+          caption="Positive plays in attack"
           tone="accent"
         />
       ) : null,
       progressed > 0 ? (
         <BigStat
           key="progressed"
-          tag="Goal"
+          tag="Progression Play"
           value={formatCount(progressed)}
           caption={progressed === 1 ? "Progressed → ended in a goal" : "Progressed → ended in goals"}
-          tone="positive"
+          tone="gold"
         />
       ) : null,
       progressed === 0 && duels1v1.goals > 0 ? (
-        <BigStat key="goal" tag="Goal" value={formatCount(duels1v1.goals)} caption={goalNote} tone="positive" />
+        <BigStat key="goal" tag="Goal" value={formatCount(duels1v1.goals)} caption={goalNote} tone="gold" />
       ) : null,
     ].filter(Boolean);
 
@@ -351,7 +350,7 @@ function buildTopics(match: MatchStats): Topic[] {
               tag="Goal"
               value={formatCount(runsInBehind.goals)}
               caption="Run generated a shot — scored"
-              tone="positive"
+              tone="gold"
             />
           ) : (
             <MiniCard title="Shot generated" value={runsInBehind.shots} note="From a run in behind" />
@@ -409,7 +408,7 @@ function buildTopics(match: MatchStats): Topic[] {
                     tag="Goal"
                     value={formatCount(oneVoneFinishing.goals)}
                     caption={oneVoneFinishing.goals === 1 ? "Scored from a 1v1" : "Scored from 1v1s"}
-                    tone="positive"
+                    tone="gold"
                   />,
                 ]
               : []),
@@ -448,7 +447,7 @@ function buildTopics(match: MatchStats): Topic[] {
                 tag="Goal"
                 value={formatCount(goals)}
                 caption={`${formatCount(goals)} of ${formatCount(finishing.onTarget)} shots on target scored`}
-                tone="positive"
+                tone="gold"
               />
             ) : (
               <MiniCard title="Goals" value={0} note="No goals in this match" />

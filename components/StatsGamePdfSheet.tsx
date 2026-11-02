@@ -12,7 +12,7 @@ type StatsGamePdfSheetProps = {
 
 type Phase = "hold-up-play" | "attacking" | "finishing";
 
-type Tone = "blue" | "green" | "amber" | "grey";
+type Tone = "blue" | "green" | "amber" | "grey" | "gold";
 
 const PHASE_LABEL: Record<Phase, string> = {
   "hold-up-play": "Hold-Up Play",
@@ -188,12 +188,11 @@ export function StatsGamePdfSheet({
 
   if (duels1v1) {
     const progressed = duels1v1.progressedToGoal ?? 0;
-    const wonNoProgression = duels1v1.wonNoProgression ?? 0;
     const tiles =
-      progressed > 0 || wonNoProgression > 0
+      progressed > 0
         ? [
-            { label: "Progressed → Goal", value: progressed, tone: "green" as Tone },
-            { label: "Won · No Progression", value: wonNoProgression, tone: "blue" as Tone },
+            { label: "Positive Plays", value: duels1v1.positive, tone: "green" as Tone },
+            { label: "Progression Play", value: progressed, tone: "gold" as Tone },
           ]
         : [
             { label: "Positive", value: duels1v1.positive, tone: "green" as Tone },
@@ -248,7 +247,7 @@ export function StatsGamePdfSheet({
     const restTiles = [
       { label: "Blocked", value: finishing.blocked, tone: "grey" as Tone },
       ...(woodwork > 0 ? [{ label: "Woodwork", value: woodwork, tone: "blue" as Tone }] : []),
-      { label: "Goal", value: goals, tone: goals > 0 ? ("green" as Tone) : ("grey" as Tone) },
+      { label: "Goal", value: goals, tone: goals > 0 ? ("gold" as Tone) : ("grey" as Tone) },
     ];
     sections.push(
       <Section
@@ -306,7 +305,7 @@ export function StatsGamePdfSheet({
             items={[
               { label: "Passes Received", value: runsInBehind.received, tone: "blue" },
               { label: "Shot Generated", value: runsInBehind.shots, tone: "grey" },
-              { label: "Goal", value: runsInBehind.goals, tone: runsInBehind.goals > 0 ? "green" : "grey" },
+              { label: "Goal", value: runsInBehind.goals, tone: runsInBehind.goals > 0 ? "gold" : "grey" },
             ]}
           />
         }
@@ -411,7 +410,7 @@ export function StatsGamePdfSheet({
             playIconUrl={playIconUrl}
             items={[
               { label: "Shots after a 1v1", value: oneVoneFinishing.shots, tone: "grey" },
-              { label: "Goal", value: oneVoneFinishing.goals, tone: oneVoneFinishing.goals > 0 ? "green" : "grey" },
+              { label: "Goal", value: oneVoneFinishing.goals, tone: oneVoneFinishing.goals > 0 ? "gold" : "grey" },
             ]}
           />
         }

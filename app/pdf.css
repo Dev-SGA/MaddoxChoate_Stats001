@@ -457,9 +457,10 @@
 }
 
 .spdf-section--strip .spdf-section__head {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
   flex: 0 0 auto;
 }
 
@@ -561,6 +562,12 @@
   border-top-color: #b3c0cb;
 }
 
+.spdf-stat--gold {
+  border-color: #e8cf8f;
+  border-top-color: #d4a017;
+  background: #fdf6e3;
+}
+
 .spdf-stat__value {
   font-size: 20px;
   font-weight: 800;
@@ -586,6 +593,10 @@
 
 .spdf-stat__value--grey {
   color: #6b8192;
+}
+
+.spdf-stat__value--gold {
+  color: #b8860b;
 }
 
 .spdf-stat__label {

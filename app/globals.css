@@ -12,6 +12,7 @@
   /* Grade hues lifted toward white so they stay legible on navy */
   --tone-accent: #5aa2e0;
   --tone-positive: #3fb56b;
+  --tone-gold: #e0b13c;
   --tone-negative: #e0616b;
   --tone-warn: #cf9c1a;
   --tone-muted: color-mix(in srgb, var(--sga-white) 26%, var(--sga-navy));
@@ -1075,6 +1076,10 @@ body::before {
 
 .big-stat--positive {
   --big-color: var(--tone-positive);
+}
+
+.big-stat--gold {
+  --big-color: var(--tone-gold);
 }
 
 .big-stat--warn {
