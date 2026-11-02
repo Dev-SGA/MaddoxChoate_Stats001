@@ -354,6 +354,7 @@ body::before {
 
 .report-main {
   min-width: 0;
+  container-type: inline-size;
 }
 
 /* ---------- Athlete ---------- */
@@ -777,58 +778,25 @@ body::before {
   color: var(--text-faint);
 }
 
-.metric-flow {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
-}
-
-.metric-flow__arrow {
-  flex: 0 0 28px;
-  align-self: center;
-  position: relative;
-  height: 2px;
-  margin: 0 4px;
-  background: color-mix(in srgb, var(--sga-white) 28%, transparent);
-}
-
-.metric-flow__arrow::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  border-top: 2px solid color-mix(in srgb, var(--sga-white) 45%, transparent);
-  border-right: 2px solid color-mix(in srgb, var(--sga-white) 45%, transparent);
-  transform: translateY(-50%) rotate(45deg);
-}
-
 .metric-card {
-  flex: 1 1 0;
-  min-width: min(100%, 220px);
-  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 20px 22px;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--surface-sunken);
   transition:
-    transform 0.15s ease,
     border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
 .metric-card:hover {
-  transform: translateY(-2px);
   border-color: var(--line-strong);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
 }
 
 .metric-card--hero {
-  display: flex;
-  flex-direction: column;
   border-color: var(--line-strong);
   background: linear-gradient(
     160deg,
@@ -837,93 +805,33 @@ body::before {
   );
 }
 
-.metric-card--hero .metric-card__value {
-  font-size: 64px;
-}
-
-.conn-layout {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 14px;
-}
-
-.conn-layout > .metric-card--hero {
-  flex: 1 1 280px;
-  min-width: 240px;
-}
-
-.conn-layout .metric-card {
-  min-width: 0;
-}
-
-.conn-side {
-  flex: 2 1 400px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
-}
-
-.conn-side__grid {
+.stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
-  flex: 1;
   align-items: stretch;
 }
 
-.conn-side__grid > * {
+.stat-grid > * {
   min-width: 0;
 }
 
-.conn-layout__col {
-  flex: 1 1 300px;
-  display: flex;
-  flex-direction: column;
+.stat-grid--1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.stat-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stat-col {
+  display: grid;
+  grid-template-rows: repeat(auto-fit, minmax(0, 1fr));
   gap: 14px;
-  min-width: 240px;
-}
-
-.conn-layout__col > * {
-  flex: 1 1 0;
-  min-height: 0;
-}
-
-.conn-top {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.conn-top .metric-card {
   min-width: 0;
-}
-
-.conn-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  gap: 10px;
-}
-
-.metric-card--mini {
-  min-width: 0;
-  padding: 12px 14px;
-}
-
-.metric-card--mini .metric-card__title {
-  margin-bottom: 8px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-}
-
-.metric-card--mini .metric-card__value {
-  font-size: 30px;
-}
-
-.metric-card--mini .metric-card__pct {
-  margin-top: 5px;
-  font-size: 11px;
 }
 
 .metric-card__title {
@@ -937,6 +845,7 @@ body::before {
 }
 
 .metric-card__value {
+  display: block;
   font-size: 56px;
   font-weight: 800;
   line-height: 1;
@@ -945,24 +854,44 @@ body::before {
 
 .metric-card__pct {
   display: block;
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 700;
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
   color: var(--text-muted);
 }
 
 .metric-card__caption {
-  margin: 10px 0 0;
+  margin: auto 0 0;
+  padding-top: 10px;
   font-size: 13px;
   color: var(--text-muted);
   line-height: 1.4;
 }
 
 .metric-card__headline {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
   font-size: 22px;
   font-weight: 800;
   line-height: 1.1;
+}
+
+.metric-card--mini {
+  justify-content: center;
+}
+
+.metric-card--mini .metric-card__title {
+  margin-bottom: 8px;
+}
+
+.metric-card--mini .metric-card__value {
+  font-size: 40px;
+}
+
+.metric-card--mini .metric-card__pct {
+  margin-top: 0;
+  padding-top: 6px;
 }
 
 .share-list {
@@ -1107,7 +1036,8 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 18px 20px;
+  min-width: 0;
+  padding: 20px 22px;
   border: 1px solid color-mix(in srgb, var(--big-color) 40%, transparent);
   border-radius: var(--radius-sm);
   background:
@@ -1120,7 +1050,6 @@ body::before {
 }
 
 .big-stat:hover {
-  transform: translateY(-2px);
   border-color: color-mix(in srgb, var(--big-color) 65%, transparent);
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
 }
@@ -1138,7 +1067,8 @@ body::before {
 }
 
 .big-stat__tag {
-  padding: 3px 10px;
+  align-self: flex-start;
+  padding: 4px 10px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--big-color) 22%, transparent);
   color: var(--big-color);
@@ -1150,15 +1080,17 @@ body::before {
 
 .big-stat__value {
   margin-top: 14px;
-  font-size: 64px;
+  font-size: 56px;
   font-weight: 800;
   line-height: 1;
   color: var(--big-color);
 }
 
 .big-stat__caption {
-  margin: 8px 0 0;
-  font-size: 14px;
+  margin: auto 0 0;
+  padding-top: 10px;
+  font-size: 13px;
+  line-height: 1.4;
   color: var(--text-muted);
 }
 
@@ -1337,27 +1269,6 @@ body::before {
     padding: 22px 14px 96px;
   }
 
-  .metric-flow {
-    flex-direction: column;
-    align-items: stretch;
-    overflow-x: visible;
-  }
-
-  .metric-flow__arrow {
-    flex: 0 0 auto;
-    width: 2px;
-    height: 20px;
-    margin: 4px auto;
-    background: color-mix(in srgb, var(--sga-white) 28%, transparent);
-  }
-
-  .metric-flow__arrow::after {
-    right: 50%;
-    top: auto;
-    bottom: 0;
-    transform: translate(50%, 0) rotate(135deg);
-  }
-
   .metric-card {
     min-width: 0;
   }
@@ -1388,4 +1299,27 @@ body::before {
 .season-mode .match-nav__pill {
   padding: 7px 12px;
   font-size: 11px;
+}
+
+/* ---------- Card grid responsiveness (container-based) ---------- */
+
+@container (max-width: 640px) {
+  .stat-grid--3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-grid--3 > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@container (max-width: 460px) {
+  .stat-grid--2,
+  .stat-grid--3 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stat-grid--3 > :first-child {
+    grid-column: auto;
+  }
 }

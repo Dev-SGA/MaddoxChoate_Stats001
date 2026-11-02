@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { AthleteProfileCard } from "@/components/AthleteProfileCard";
 import { ExportPdfButton } from "@/components/ExportPdfButton";
 import { ClipAnchor, ClipLegendLabel, ClipMetricTitle } from "@/components/ClipUi";
@@ -97,9 +97,19 @@ function HeroCard({
   );
 }
 
-function MiniCard({ title, value, note }: { title: string; value: number | string; note?: string }) {
+function MiniCard({
+  title,
+  value,
+  note,
+  compact,
+}: {
+  title: string;
+  value: number | string;
+  note?: string;
+  compact?: boolean;
+}) {
   return (
-    <div className="metric-card metric-card--mini">
+    <div className={`metric-card${compact ? " metric-card--mini" : ""}`}>
       <h3 className="metric-card__title">{title}</h3>
       <span className="metric-card__value">{typeof value === "number" ? formatCount(value) : value}</span>
       {note ? <span className="metric-card__pct">{note}</span> : null}
@@ -127,19 +137,22 @@ function BigStat({
   );
 }
 
+function StatGrid({ children }: { children: React.ReactNode }) {
+  const count = Math.min(3, Math.max(1, React.Children.toArray(children).length));
+  return <div className={`stat-grid stat-grid--${count}`}>{children}</div>;
+}
+
 function StatRow({ hero, cards }: { hero: React.ReactNode; cards: React.ReactNode[] }) {
   return (
-    <div className="conn-layout">
+    <StatGrid>
       {hero}
-      <div className="conn-side">
-        <div className="conn-side__grid">{cards}</div>
-      </div>
-    </div>
+      {cards}
+    </StatGrid>
   );
 }
 
 function StatCol({ children }: { children: React.ReactNode }) {
-  return <div className="conn-layout__col">{children}</div>;
+  return <div className="stat-col">{children}</div>;
 }
 
 function MatchSwitcher({
@@ -286,7 +299,7 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "1v1 — Offensive Duels",
       phase: "attacking",
       content: (
-        <div className="conn-layout">
+        <StatGrid>
           <StatCol>
             <HeroCard
               title="Offensive duels"
@@ -304,7 +317,7 @@ function buildTopics(match: MatchStats): Topic[] {
             />
           </StatCol>
           {positiveBreakdown.length > 0 ? <StatCol>{positiveBreakdown}</StatCol> : null}
-        </div>
+        </StatGrid>
       ),
     });
   }
@@ -315,7 +328,7 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Runs in Behind",
       phase: "attacking",
       content: (
-        <div className="conn-side__grid">
+        <StatGrid>
           <HeroCard
             title="Runs in behind"
             value={runsInBehind.runs}
@@ -333,7 +346,7 @@ function buildTopics(match: MatchStats): Topic[] {
           ) : (
             <MiniCard title="Shot generated" value={runsInBehind.shots} note="From a run in behind" />
           )}
-        </div>
+        </StatGrid>
       ),
     });
   }
@@ -344,7 +357,7 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Passing",
       phase: "attacking",
       content: (
-        <div className="conn-layout">
+        <StatGrid>
           <HeroCard
             title="Final-third passes"
             value={passing.finalThird}
@@ -352,14 +365,15 @@ function buildTopics(match: MatchStats): Topic[] {
             href={linkOf(passing)}
           />
           <StatCol>
-            <MiniCard title="Passes into the box" value={passing.intoBox} note="Delivered into the penalty area" />
+            <MiniCard compact title="Passes into the box" value={passing.intoBox} note="Delivered into the penalty area" />
             <MiniCard
+              compact
               title="Into the box share"
               value={`${percent(passing.intoBox, passing.finalThird)}%`}
               note="of final-third passes into the box"
             />
           </StatCol>
-        </div>
+        </StatGrid>
       ),
     });
   }
@@ -405,7 +419,7 @@ function buildTopics(match: MatchStats): Topic[] {
       { label: "Blocked", value: finishing.blocked, tone: "muted" },
     ];
     if (finishing.woodwork && finishing.woodwork > 0) {
-      segments.push({ label: "Woodwork", value: finishing.woodwork, tone: "muted" });
+      segments.push({ label: "Woodwork", value: finishing.woodwork, tone: "accent" });
     }
     const goals = finishing.goals ?? 0;
 
@@ -427,7 +441,7 @@ function buildTopics(match: MatchStats): Topic[] {
             <OutcomeMeter
               key="accuracy"
               title="Shot outcome"
-              headline={`${formatCount(finishing.onTarget)} of ${formatCount(finishing.shots)} on target · ${percent(finishing.onTarget, finishing.shots)}%`}
+              headline={`${percent(finishing.onTarget, finishing.shots)}% on target`}
               segments={segments}
             />,
             ...(goals > 0
