@@ -28,7 +28,17 @@ type Segment = {
   href?: string;
 };
 
-function OutcomeMeter({ title, headline, segments }: { title: string; headline: string; segments: Segment[] }) {
+function OutcomeMeter({
+  title,
+  headline,
+  segments,
+  inlineLegend,
+}: {
+  title: string;
+  headline: string;
+  segments: Segment[];
+  inlineLegend?: boolean;
+}) {
   const total = segments.reduce((sum, segment) => sum + segment.value, 0);
 
   return (
@@ -50,7 +60,7 @@ function OutcomeMeter({ title, headline, segments }: { title: string; headline: 
           ) : null,
         )}
       </div>
-      <ul className="legend">
+      <ul className={`legend${inlineLegend ? " legend--inline" : ""}`}>
         {segments.map((segment) => (
           <li key={segment.label}>
             <span className={`legend__dot legend__dot--${segment.tone}`} />
@@ -364,15 +374,12 @@ function buildTopics(match: MatchStats): Topic[] {
             caption="Passes played in the attacking third"
             href={linkOf(passing)}
           />
-          <StatCol>
-            <MiniCard compact title="Passes into the box" value={passing.intoBox} note="Delivered into the penalty area" />
-            <MiniCard
-              compact
-              title="Into the box share"
-              value={`${percent(passing.intoBox, passing.finalThird)}%`}
-              note="of final-third passes into the box"
-            />
-          </StatCol>
+          <MiniCard title="Passes into the box" value={passing.intoBox} note="Delivered into the penalty area" />
+          <MiniCard
+            title="Into the box share"
+            value={`${percent(passing.intoBox, passing.finalThird)}%`}
+            note="of final-third passes into the box"
+          />
         </StatGrid>
       ),
     });
@@ -428,35 +435,32 @@ function buildTopics(match: MatchStats): Topic[] {
       title: "Finishing",
       phase: "finishing",
       content: (
-        <StatRow
-          hero={
+        <div className="stat-stack">
+          <StatGrid>
             <HeroCard
               title="Total shots"
               value={finishing.shots}
               caption="All finishing attempts in the match"
               href={linkOf(finishing)}
             />
-          }
-          cards={[
-            <OutcomeMeter
-              key="accuracy"
-              title="Shot outcome"
-              headline={`${percent(finishing.onTarget, finishing.shots)}% on target`}
-              segments={segments}
-            />,
-            ...(goals > 0
-              ? [
-                  <BigStat
-                    key="goal"
-                    tag="Goal"
-                    value={formatCount(goals)}
-                    caption={`${formatCount(goals)} of ${formatCount(finishing.onTarget)} shots on target scored`}
-                    tone="positive"
-                  />,
-                ]
-              : []),
-          ]}
-        />
+            {goals > 0 ? (
+              <BigStat
+                tag="Goal"
+                value={formatCount(goals)}
+                caption={`${formatCount(goals)} of ${formatCount(finishing.onTarget)} shots on target scored`}
+                tone="positive"
+              />
+            ) : (
+              <MiniCard title="Goals" value={0} note="No goals in this match" />
+            )}
+          </StatGrid>
+          <OutcomeMeter
+            title="Shot outcome"
+            headline={`${percent(finishing.onTarget, finishing.shots)}% on target`}
+            segments={segments}
+            inlineLegend
+          />
+        </div>
       ),
     });
   }

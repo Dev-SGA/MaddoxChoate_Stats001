@@ -834,6 +834,11 @@ body::before {
   min-width: 0;
 }
 
+.stat-stack {
+  display: grid;
+  gap: 14px;
+}
+
 .metric-card__title {
   margin: 0 0 14px;
   font-size: 15px;
@@ -1007,6 +1012,16 @@ body::before {
   gap: 8px;
   align-items: center;
   font-size: 13px;
+}
+
+.legend--inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+}
+
+.legend--inline li {
+  grid-template-columns: 10px auto auto;
 }
 
 .legend__dot {
