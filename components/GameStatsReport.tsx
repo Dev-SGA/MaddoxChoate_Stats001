@@ -283,9 +283,9 @@ function buildTopics(match: MatchStats): Topic[] {
       duels1v1.positive > 0 ? (
         <BigStat
           key="positive"
-          tag="Positive Plays"
+          tag="Duels Won"
           value={formatCount(duels1v1.positive)}
-          caption="Positive plays in attack"
+          caption="Duels won in attack"
           tone="accent"
         />
       ) : null,
@@ -320,8 +320,8 @@ function buildTopics(match: MatchStats): Topic[] {
               title="Duel outcome"
               headline={`${formatCount(duels1v1.positive)} of ${formatCount(duels1v1.total)} · ${percent(duels1v1.positive, duels1v1.total)}%`}
               segments={[
-                { label: "Positive Plays", value: duels1v1.positive, tone: "positive" },
-                { label: "Negative Plays", value: duels1v1.negative, tone: "warn" },
+                { label: "Duels Won", value: duels1v1.positive, tone: "positive" },
+                { label: "Duels Lost", value: duels1v1.negative, tone: "warn" },
               ]}
             />
           </StatCol>
