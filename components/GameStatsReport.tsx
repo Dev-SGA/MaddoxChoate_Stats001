@@ -139,16 +139,24 @@ function BigStat({
   caption,
   tone,
   tag,
+  href,
 }: {
   value: string;
   caption: string;
   tone: "positive" | "warn" | "accent" | "gold";
   tag?: string;
+  href?: string;
 }) {
   return (
     <div className={`big-stat big-stat--${tone}`}>
       {tag ? <span className="big-stat__tag">{tag}</span> : null}
-      <span className="big-stat__value">{value}</span>
+      {href ? (
+        <ClipAnchor href={href} className="big-stat__value clip-link--value" ariaLabel="Open video">
+          {value}
+        </ClipAnchor>
+      ) : (
+        <span className="big-stat__value">{value}</span>
+      )}
       <p className="big-stat__caption">{caption}</p>
     </div>
   );
@@ -250,6 +258,7 @@ function buildTopics(match: MatchStats): Topic[] {
           value={formatCount(backToGoalDuels.heldOff)}
           caption="Successful hold-ups playing with his back to goal — held the ball up and brought teammates into the attack."
           tone="positive"
+          href={linkOf(backToGoalDuels)}
         />
       ),
     });
@@ -498,6 +507,7 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
 
   const videoLinks: Record<string, string> = {};
   for (const [key, group] of Object.entries({
+    backToGoalDuels: match.backToGoalDuels,
     backToGoalPlay: match.backToGoalPlay,
     oneVoneFinishing: match.oneVoneFinishing,
     duels1v1: match.duels1v1,

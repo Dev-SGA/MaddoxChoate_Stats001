@@ -8,6 +8,7 @@ export type MatchVideo = {
 /** Successful back-to-goal duels where the striker held the ball up. */
 export type BackToGoalDuels = {
   heldOff: number;
+  videoLink?: string;
 };
 
 export type BackToGoalPlay = {

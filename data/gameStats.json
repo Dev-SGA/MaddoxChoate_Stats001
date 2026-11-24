@@ -81,7 +81,8 @@
       "shortLabel": "Nashville SC",
       "logo": "/clubs/nashville-sc.png",
       "backToGoalDuels": {
-        "heldOff": 8
+        "heldOff": 8,
+        "videoLink": "https://drive.google.com/file/d/1QwJGmOXMoO6fFPjchTx8iiHo9kk15bxw/view?usp=drive_link"
       },
       "backToGoalPlay": {
         "verticalPasses": 1,
@@ -94,14 +95,16 @@
         "shots": 0,
         "duelsWon": 0,
         "total": 2,
-        "goals": 0
+        "goals": 0,
+        "videoLink": "https://drive.google.com/file/d/1U_eQYSgl1yEHUyLcqOtf4uWb9Yn5W0Zr/view?usp=drive_link"
       },
       "finishing": {
         "shots": 1,
         "onTarget": 0,
         "goals": 0,
         "offTarget": 0,
-        "blocked": 1
+        "blocked": 1,
+        "videoLink": "https://drive.google.com/file/d/1b_y6lDbaKqv7ty4Eni8YPWr84D6QSP2G/view?usp=drive_link"
       }
     }
   ]

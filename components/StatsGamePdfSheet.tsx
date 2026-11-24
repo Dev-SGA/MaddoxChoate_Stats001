@@ -231,6 +231,7 @@ export function StatsGamePdfSheet({
         title="Back-to-Goal Duels"
         value={backToGoalDuels.heldOff}
         unit="Successful hold-ups"
+        playHref={linkOf(backToGoalDuels)}
         playIconUrl={playIconUrl}
         aside={
           <p className="spdf-note">
