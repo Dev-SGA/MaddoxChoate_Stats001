@@ -153,6 +153,8 @@ function BigStat({
       {href ? (
         <ClipAnchor href={href} className="big-stat__value clip-link--value" ariaLabel="Open video">
           {value}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/brand/play-icon.png" alt="" className="play-icon" width={14} height={14} />
         </ClipAnchor>
       ) : (
         <span className="big-stat__value">{value}</span>

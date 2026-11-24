@@ -71,6 +71,8 @@ export function ClipMetricTitle({ label, href }: { label: string; href?: string 
     <h3 className="metric-card__title">
       <ClipAnchor href={href} ariaLabel={`Open video: ${label}`}>
         {label}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/play-icon.png" alt="" className="play-icon play-icon--legend" width={14} height={14} />
       </ClipAnchor>
     </h3>
   );
