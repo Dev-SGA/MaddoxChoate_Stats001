@@ -35,6 +35,7 @@
       "finishing": {
         "shots": 5,
         "onTarget": 3,
+        "goals": 1,
         "offTarget": 1,
         "blocked": 1,
         "videoLink": "https://drive.google.com/file/d/1n9Y_y0qkeonpGk7T6Mf3MkZ8Zkh1cqmO/view?usp=drive_link"
@@ -72,6 +73,34 @@
         "offTarget": 2,
         "blocked": 1,
         "woodwork": 1
+      }
+    },
+    {
+      "id": "nashville-sc",
+      "label": "vs Nashville SC",
+      "shortLabel": "Nashville SC",
+      "logo": "/clubs/nashville-sc.png",
+      "backToGoalDuels": {
+        "heldOff": 8
+      },
+      "backToGoalPlay": {
+        "verticalPasses": 1,
+        "keyPasses": 0,
+        "completed": 8,
+        "incomplete": 0,
+        "note": "Only 1 forward — rest backwards"
+      },
+      "oneVoneFinishing": {
+        "shots": 0,
+        "duelsWon": 2,
+        "goals": 0
+      },
+      "finishing": {
+        "shots": 1,
+        "onTarget": 0,
+        "goals": 0,
+        "offTarget": 0,
+        "blocked": 1
       }
     }
   ]

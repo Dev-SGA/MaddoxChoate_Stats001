@@ -15,6 +15,8 @@ export type BackToGoalPlay = {
   keyPasses: number;
   completed: number;
   incomplete: number;
+  /** Optional direction note, e.g. "Only 1 forward — rest backwards". */
+  note?: string;
   videoLink?: string;
 };
 

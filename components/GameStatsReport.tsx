@@ -261,6 +261,16 @@ function buildTopics(match: MatchStats): Topic[] {
           }
           cards={[
             <MiniCard key="key" title="Key passes" value={backToGoalPlay.keyPasses} note="Set up a clear chance" />,
+            ...(backToGoalPlay.note
+              ? [
+                  <MiniCard
+                    key="backwards"
+                    title="Backwards"
+                    value={Math.max(attempts - backToGoalPlay.verticalPasses, 0)}
+                    note={backToGoalPlay.note}
+                  />,
+                ]
+              : []),
             <OutcomeMeter
               key="completion"
               title="Pass completion"
@@ -411,7 +421,7 @@ function buildTopics(match: MatchStats): Topic[] {
                     tone="gold"
                   />,
                 ]
-              : []),
+              : [<MiniCard key="goal" title="Goals" value={0} note="No goals from 1v1s" />]),
           ]}
         />
       ),

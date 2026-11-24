@@ -347,7 +347,7 @@ export function StatsGamePdfSheet({
           <RateBar
             label="Pass completion"
             value={pct(backToGoalPlay.completed, attempts)}
-            note={`${formatCount(backToGoalPlay.completed)} of ${formatCount(attempts)} passes completed`}
+            note={`${formatCount(backToGoalPlay.completed)} of ${formatCount(attempts)} passes completed${backToGoalPlay.note ? ` · ${backToGoalPlay.note}` : ""}`}
             segments={[
               { value: backToGoalPlay.completed, tone: "green" },
               { value: backToGoalPlay.incomplete, tone: "amber" },
@@ -418,7 +418,11 @@ export function StatsGamePdfSheet({
           <RateBar
             label="Conversion"
             value={pct(oneVoneFinishing.goals, oneVoneFinishing.shots)}
-            note={`${formatCount(oneVoneFinishing.goals)} of ${formatCount(oneVoneFinishing.shots)} shots scored`}
+            note={
+              oneVoneFinishing.shots > 0
+                ? `${formatCount(oneVoneFinishing.goals)} of ${formatCount(oneVoneFinishing.shots)} shots scored`
+                : "No shots after a 1v1"
+            }
             segments={[
               { value: oneVoneFinishing.goals, tone: "green" },
               { value: Math.max(oneVoneFinishing.shots - oneVoneFinishing.goals, 0), tone: "grey" },
