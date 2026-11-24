@@ -130,6 +130,7 @@ function Section({
   phase,
   title,
   value,
+  valueNode,
   unit,
   aside,
   footer,
@@ -140,6 +141,7 @@ function Section({
   phase: Phase;
   title: string;
   value: number;
+  valueNode?: React.ReactNode;
   unit: string;
   aside?: React.ReactNode;
   footer?: React.ReactNode;
@@ -159,7 +161,7 @@ function Section({
       <div className="spdf-section__body">
         <div className="spdf-section__kpi">
           <span className="spdf-section__value">
-            <PdfPlayTarget href={playHref}>{formatCount(value)}</PdfPlayTarget>
+            <PdfPlayTarget href={playHref}>{valueNode ?? formatCount(value)}</PdfPlayTarget>
             <PdfPlay href={playHref} playIconUrl={playIconUrl} />
           </span>
           <span className="spdf-section__unit">{unit}</span>
@@ -401,7 +403,21 @@ export function StatsGamePdfSheet({
         phase="finishing"
         title="1v1 + Finishing"
         value={oneVoneFinishing.duelsWon}
-        unit="1v1 duels won"
+        valueNode={
+          oneVoneFinishing.total != null ? (
+            <span>
+              <span className="spdf-section__value-part">{formatCount(oneVoneFinishing.duelsWon)}/</span>
+              {formatCount(oneVoneFinishing.total)}
+            </span>
+          ) : undefined
+        }
+        unit={
+          oneVoneFinishing.total == null
+            ? "1v1 duels won"
+            : oneVoneFinishing.duelsWon === 0
+              ? `${oneVoneFinishing.total} 1v1 duels, none won`
+              : `${oneVoneFinishing.duelsWon} of ${oneVoneFinishing.total} 1v1 duels won`
+        }
         playHref={linkOf(oneVoneFinishing)}
         playIconUrl={playIconUrl}
         layout="strip"

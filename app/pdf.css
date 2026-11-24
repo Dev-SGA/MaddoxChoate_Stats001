@@ -391,6 +391,12 @@
   color: #072334;
 }
 
+.spdf-section__value-part {
+  font-size: 0.55em;
+  letter-spacing: 0;
+  color: #6b8192;
+}
+
 .spdf-section__unit {
   margin-top: 5px;
   font-size: 9px;

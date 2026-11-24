@@ -7,6 +7,7 @@ import { ClipAnchor, ClipLegendLabel, ClipMetricTitle } from "@/components/ClipU
 import { VideoLinksProvider } from "@/components/VideoLinksContext";
 import { SgaBrand } from "@/components/SgaBrand";
 import { SgaCornerBrand } from "@/components/SgaCornerBrand";
+import { ProgressView } from "@/components/ProgressView";
 import { TopicsBoard, type Topic } from "@/components/TopicsBoard";
 import { BRAND } from "@/lib/brand";
 import { formatCount, toGameStats, type MatchStats, type StatsReport } from "@/lib/stats";
@@ -33,11 +34,13 @@ function OutcomeMeter({
   headline,
   segments,
   inlineLegend,
+  note,
 }: {
   title: string;
   headline: string;
   segments: Segment[];
   inlineLegend?: boolean;
+  note?: string;
 }) {
   const total = segments.reduce((sum, segment) => sum + segment.value, 0);
 
@@ -77,6 +80,7 @@ function OutcomeMeter({
           </li>
         ))}
       </ul>
+      {note ? <p className="metric-card__note">{note}</p> : null}
     </div>
   );
 }
@@ -84,23 +88,26 @@ function OutcomeMeter({
 function HeroCard({
   title,
   value,
+  valueNode,
   caption,
   href,
 }: {
   title: string;
   value: number;
+  valueNode?: React.ReactNode;
   caption: string;
   href?: string;
 }) {
+  const display = valueNode ?? formatCount(value);
   return (
     <div className="metric-card metric-card--hero">
       <ClipMetricTitle label={title} href={href} />
       {href ? (
         <ClipAnchor href={href} className="metric-card__value clip-link--value" ariaLabel={`Open video: ${title}`}>
-          {formatCount(value)}
+          {display}
         </ClipAnchor>
       ) : (
-        <span className="metric-card__value">{formatCount(value)}</span>
+        <span className="metric-card__value">{display}</span>
       )}
       <p className="metric-card__caption">{caption}</p>
     </div>
@@ -224,6 +231,11 @@ function linkOf(group: { videoLink?: string } | null | undefined): string | unde
   return trimmed || undefined;
 }
 
+function oneVoneCaption({ duelsWon, total }: { duelsWon: number; total?: number }): string {
+  if (total == null) return "Duels won that created a shooting chance";
+  return duelsWon === 0 ? `${total} 1v1 duels, none won` : `${duelsWon} of ${total} 1v1 duels won`;
+}
+
 function buildTopics(match: MatchStats): Topic[] {
   const { backToGoalDuels, backToGoalPlay, oneVoneFinishing, duels1v1, runsInBehind, passing, finishing } = match;
   const topics: Topic[] = [];
@@ -261,16 +273,6 @@ function buildTopics(match: MatchStats): Topic[] {
           }
           cards={[
             <MiniCard key="key" title="Key passes" value={backToGoalPlay.keyPasses} note="Set up a clear chance" />,
-            ...(backToGoalPlay.note
-              ? [
-                  <MiniCard
-                    key="backwards"
-                    title="Backwards"
-                    value={Math.max(attempts - backToGoalPlay.verticalPasses, 0)}
-                    note={backToGoalPlay.note}
-                  />,
-                ]
-              : []),
             <OutcomeMeter
               key="completion"
               title="Pass completion"
@@ -279,6 +281,7 @@ function buildTopics(match: MatchStats): Topic[] {
                 { label: "Completed", value: backToGoalPlay.completed, tone: "positive" },
                 { label: "Incomplete", value: backToGoalPlay.incomplete, tone: "warn" },
               ]}
+              note={backToGoalPlay.note}
             />,
           ]}
         />
@@ -405,7 +408,15 @@ function buildTopics(match: MatchStats): Topic[] {
             <HeroCard
               title="1v1 duels won"
               value={oneVoneFinishing.duelsWon}
-              caption="Duels won that created a shooting chance"
+              valueNode={
+                oneVoneFinishing.total != null ? (
+                  <>
+                    <span className="metric-card__value-part">{formatCount(oneVoneFinishing.duelsWon)}/</span>
+                    {formatCount(oneVoneFinishing.total)}
+                  </>
+                ) : undefined
+              }
+              caption={oneVoneCaption(oneVoneFinishing)}
               href={linkOf(oneVoneFinishing)}
             />
           }
@@ -479,6 +490,7 @@ function buildTopics(match: MatchStats): Topic[] {
 
 export function GameStatsReport({ report }: GameStatsReportProps) {
   const { player, meta, matches } = report;
+  const [tab, setTab] = useState<"match" | "progress">("match");
   const [matchId, setMatchId] = useState(matches[matches.length - 1]?.id ?? "");
   const match = matches.find((item) => item.id === matchId) ?? matches[0];
   const exportStats = useMemo(() => toGameStats(report, match), [report, match]);
@@ -507,11 +519,11 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
             <p className="report-header__eyebrow">{BRAND.legal}</p>
             <h1 className="report-header__title">{meta.title}</h1>
             <p className="report-header__meta">
-              {match.logo ? (
+              {tab === "progress" ? null : match.logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={match.logo} alt="" className="club-logo club-logo--meta" />
               ) : null}
-              {match.label}
+              {tab === "progress" ? "Progress across matches" : match.label}
             </p>
           </div>
         </header>
@@ -528,8 +540,33 @@ export function GameStatsReport({ report }: GameStatsReportProps) {
 
           <main className="report-main">
             <div className="view-panel">
-              <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
-              <TopicsBoard key={match.id} topics={topics} />
+              <div className="match-nav__pills view-tabs" role="tablist" aria-label="Report view">
+                {(
+                  [
+                    { id: "match", label: "Match" },
+                    { id: "progress", label: "Progress" },
+                  ] as const
+                ).map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === item.id}
+                    className={`match-nav__pill${tab === item.id ? " is-active" : ""}`}
+                    onClick={() => setTab(item.id)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              {tab === "progress" ? (
+                <ProgressView matches={matches} />
+              ) : (
+                <>
+                  <MatchSwitcher matches={matches} activeId={match.id} onChange={setMatchId} />
+                  <TopicsBoard key={match.id} topics={topics} />
+                </>
+              )}
             </div>
           </main>
         </div>

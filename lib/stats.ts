@@ -24,6 +24,8 @@ export type BackToGoalPlay = {
 export type OneVoneFinishing = {
   shots: number;
   duelsWon: number;
+  /** Total 1v1 duels attempted. */
+  total?: number;
   goals: number;
   videoLink?: string;
 };
@@ -146,4 +148,128 @@ export function toGameStats(report: StatsReport, match: MatchStats): GameStats {
     finishing: match.finishing ?? null,
     videos: match.videos,
   };
+}
+
+function rate(part: number, total: number): number {
+  return total > 0 ? Math.round((part / total) * 100) : 0;
+}
+
+export type ProgressPoint = {
+  id: string;
+  label: string;
+  shortLabel: string;
+  logo?: string;
+  quantity: number;
+  /** Success rate in percent (0-100). */
+  quality?: number;
+  qualityDetail?: string;
+};
+
+export type ProgressMetric = {
+  id: string;
+  title: string;
+  phase: "hold-up-play" | "attacking" | "finishing";
+  quantityLabel: string;
+  qualityLabel?: string;
+  points: ProgressPoint[];
+};
+
+/** Match-by-match trend metrics; only matches with back-to-goal play are compared. */
+export function progressMetrics(allMatches: MatchStats[]): ProgressMetric[] {
+  const matches = allMatches.filter((match) => match.backToGoalPlay);
+  if (matches.length === 0) return [];
+
+  const base = (match: MatchStats) => ({
+    id: match.id,
+    label: match.label,
+    shortLabel: match.shortLabel,
+    logo: match.logo,
+  });
+  const every = (pick: (match: MatchStats) => unknown) => matches.every((match) => pick(match) != null);
+  const everyOneVoneTotal = matches.every((match) => match.oneVoneFinishing?.total != null);
+
+  const metrics: (ProgressMetric | null)[] = [
+    every((match) => match.backToGoalDuels)
+      ? {
+          id: "back-to-goal-duels",
+          title: "Back-to-Goal Duels",
+          phase: "hold-up-play",
+          quantityLabel: "Hold-ups",
+          points: matches.map((match) => ({ ...base(match), quantity: match.backToGoalDuels?.heldOff ?? 0 })),
+        }
+      : null,
+    {
+      id: "vertical-passes",
+      title: "Vertical Passes",
+      phase: "hold-up-play",
+      quantityLabel: "Vertical passes",
+      qualityLabel: "Pass completion",
+      points: matches.map((match) => {
+        const play = match.backToGoalPlay!;
+        const attempts = play.completed + play.incomplete;
+        return {
+          ...base(match),
+          quantity: play.verticalPasses,
+          quality: rate(play.completed, attempts),
+          qualityDetail: `${play.completed} of ${attempts} completed`,
+        };
+      }),
+    },
+    {
+      id: "key-passes",
+      title: "Key Passes",
+      phase: "hold-up-play",
+      quantityLabel: "Key passes",
+      points: matches.map((match) => ({ ...base(match), quantity: match.backToGoalPlay!.keyPasses })),
+    },
+    every((match) => match.oneVoneFinishing)
+      ? {
+          id: "one-v-one",
+          title: "1v1 Duels Won",
+          phase: "finishing",
+          quantityLabel: "Won",
+          ...(everyOneVoneTotal ? { qualityLabel: "Win rate" } : {}),
+          points: matches.map((match) => {
+            const won = match.oneVoneFinishing!.duelsWon;
+            const total = match.oneVoneFinishing!.total;
+            return {
+              ...base(match),
+              quantity: won,
+              ...(everyOneVoneTotal && total != null
+                ? { quality: rate(won, total), qualityDetail: `${won} of ${total} won` }
+                : {}),
+            };
+          }),
+        }
+      : null,
+    every((match) => match.finishing)
+      ? {
+          id: "shots",
+          title: "Shots",
+          phase: "finishing",
+          quantityLabel: "Shots",
+          qualityLabel: "On target",
+          points: matches.map((match) => {
+            const { shots, onTarget } = match.finishing!;
+            return {
+              ...base(match),
+              quantity: shots,
+              quality: rate(onTarget, shots),
+              qualityDetail: `${onTarget} of ${shots} on target`,
+            };
+          }),
+        }
+      : null,
+    every((match) => match.finishing)
+      ? {
+          id: "goals",
+          title: "Goals",
+          phase: "finishing",
+          quantityLabel: "Goals",
+          points: matches.map((match) => ({ ...base(match), quantity: match.finishing!.goals ?? 0 })),
+        }
+      : null,
+  ];
+
+  return metrics.filter((metric): metric is ProgressMetric => metric !== null);
 }

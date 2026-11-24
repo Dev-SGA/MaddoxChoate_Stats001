@@ -92,7 +92,8 @@
       },
       "oneVoneFinishing": {
         "shots": 0,
-        "duelsWon": 2,
+        "duelsWon": 0,
+        "total": 2,
         "goals": 0
       },
       "finishing": {
