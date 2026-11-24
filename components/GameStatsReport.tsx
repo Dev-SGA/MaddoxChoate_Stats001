@@ -406,7 +406,7 @@ function buildTopics(match: MatchStats): Topic[] {
         <StatRow
           hero={
             <HeroCard
-              title="1v1 duels won"
+              title={oneVoneFinishing.duelsWon > 0 ? "1v1 duels won" : "1v1 duels"}
               value={oneVoneFinishing.duelsWon}
               valueNode={
                 oneVoneFinishing.total != null ? (
